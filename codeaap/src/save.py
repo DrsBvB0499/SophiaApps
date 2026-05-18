@@ -1,7 +1,10 @@
 import json
 import os
 
-PROGRESS_PATH = os.path.join("data", "progress.json")
+# When frozen by PyInstaller the writable data dir is next to the .exe,
+# injected via CODEAAP_DATA_DIR before this module is first imported.
+_DATA_DIR     = os.environ.get("CODEAAP_DATA_DIR", "data")
+PROGRESS_PATH = os.path.join(_DATA_DIR, "progress.json")
 
 DEFAULT_PROGRESS = {
     "player_name": "",
@@ -14,7 +17,7 @@ DEFAULT_PROGRESS = {
 
 
 def load_progress() -> dict:
-    os.makedirs("data", exist_ok=True)
+    os.makedirs(_DATA_DIR, exist_ok=True)
     if not os.path.exists(PROGRESS_PATH):
         save_progress(DEFAULT_PROGRESS.copy())
         return DEFAULT_PROGRESS.copy()
@@ -29,12 +32,13 @@ def load_progress() -> dict:
 
 
 def save_progress(progress: dict) -> None:
-    os.makedirs("data", exist_ok=True)
+    os.makedirs(_DATA_DIR, exist_ok=True)
     with open(PROGRESS_PATH, "w", encoding="utf-8") as f:
         json.dump(progress, f, ensure_ascii=False, indent=2)
 
 
 def load_levels() -> dict:
+    # levels.json is a bundled read-only asset; cwd is set to the bundle dir.
     path = os.path.join("data", "levels.json")
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)

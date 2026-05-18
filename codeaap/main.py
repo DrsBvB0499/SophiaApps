@@ -2,8 +2,20 @@
 import os
 import sys
 
-# Ensure working directory is the project root
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+# When frozen by PyInstaller, bundled read-only assets live in sys._MEIPASS.
+# We chdir there so all relative asset paths (fonts, sounds, levels.json) work.
+# save.py writes progress.json next to the .exe instead (see _APP_DIR below).
+if getattr(sys, "frozen", False):
+    _BUNDLE_DIR = sys._MEIPASS                          # read-only bundle
+    _APP_DIR    = os.path.dirname(sys.executable)       # writable, next to .exe
+else:
+    _BUNDLE_DIR = os.path.dirname(os.path.abspath(__file__))
+    _APP_DIR    = _BUNDLE_DIR
+
+os.chdir(_BUNDLE_DIR)
+
+# Make the writable data dir available to save.py before it is imported.
+os.environ.setdefault("CODEAAP_DATA_DIR", os.path.join(_APP_DIR, "data"))
 
 import pygame
 from src.config import SCREEN_WIDTH, SCREEN_HEIGHT, FPS, TITLE
