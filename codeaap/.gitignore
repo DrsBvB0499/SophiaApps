@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+data/progress.json
+assets/fonts/*.ttf
+assets/sounds/*.wav
+assets/sounds/*.ogg
