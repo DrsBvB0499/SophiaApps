@@ -29,8 +29,10 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=["tkinter", "unittest", "email", "html", "http", "urllib",
-              "xmlrpc", "pydoc", "doctest", "distutils", "numpy"],
+    # Only exclude things that are truly never needed.
+    # Do NOT exclude stdlib modules (urllib, email, http, etc.) —
+    # PyInstaller's own pyi_rth_pkgres runtime hook needs them internally.
+    excludes=["tkinter", "numpy"],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
