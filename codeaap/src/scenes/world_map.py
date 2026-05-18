@@ -17,6 +17,42 @@ _ISLAND_COLORS = {
 }
 
 
+def _draw_lock_icon(surface: pygame.Surface, cx: int, cy: int,
+                     size: int, color: tuple) -> None:
+    """Draw a padlock shape — no emoji needed."""
+    bw = int(size * 1.4)
+    bh = int(size * 1.1)
+    body = pygame.Rect(cx - bw // 2, cy - bh // 4, bw, bh)
+    pygame.draw.rect(surface, color, body, border_radius=4)
+    # Shackle arc
+    arc_r = pygame.Rect(cx - size // 2, cy - size - bh // 4,
+                         size, int(size * 1.2))
+    pygame.draw.arc(surface, color, arc_r, 0, math.pi, max(2, size // 5))
+    # Keyhole
+    kh_color = tuple(max(0, c - 60) for c in color)
+    pygame.draw.circle(surface, kh_color, (cx, cy + bh // 4 - 4), max(2, size // 5))
+
+
+def _draw_crown_icon(surface: pygame.Surface, cx: int, cy: int,
+                      size: int, color: tuple) -> None:
+    """Draw a simple crown shape — no emoji needed."""
+    pts = [
+        (cx - size,     cy + size // 2),
+        (cx - size,     cy - size // 4),
+        (cx - size // 2, cy + size // 4),
+        (cx,            cy - size),
+        (cx + size // 2, cy + size // 4),
+        (cx + size,     cy - size // 4),
+        (cx + size,     cy + size // 2),
+    ]
+    pygame.draw.polygon(surface, color, pts)
+    pygame.draw.polygon(surface, (200, 160, 0), pts, 2)
+    for px, py in [(cx - size // 2, cy - size // 5),
+                    (cx,             cy - size),
+                    (cx + size // 2, cy - size // 5)]:
+        pygame.draw.circle(surface, (255, 240, 120), (px, py), max(2, size // 5))
+
+
 class WorldMapScene:
     def __init__(self, progress: dict, levels_data: dict):
         self.progress = progress
@@ -78,7 +114,17 @@ class WorldMapScene:
                     self._island_hover = iid
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            # Check island click
+            # FIX: check level panel buttons FIRST — they overlap the island circle
+            if self._selected_island:
+                for btn_rect, lv in self._level_buttons.get(self._selected_island, []):
+                    if btn_rect.collidepoint(event.pos):
+                        if self._is_level_unlocked(self._selected_island, lv["id"]):
+                            sounds.play("click")
+                            self._next_level_info = (self._selected_island, lv)
+                            self._next_scene = "level"
+                        return  # consumed by level panel regardless
+
+            # Then check island circle clicks
             for iid, rect in self._island_rects.items():
                 if rect.collidepoint(event.pos):
                     if iid in self.progress.get("islands_unlocked", [1]):
@@ -89,17 +135,7 @@ class WorldMapScene:
                             self._selected_island = iid
                     return
 
-            # Check level button click
-            if self._selected_island:
-                for btn_rect, lv in self._level_buttons.get(self._selected_island, []):
-                    if btn_rect.collidepoint(event.pos):
-                        if self._is_level_unlocked(self._selected_island, lv["id"]):
-                            sounds.play("click")
-                            self._next_level_info = (self._selected_island, lv)
-                            self._next_scene = "level"
-                        return
-
-            # Click outside — deselect
+            # Click outside panel and islands → deselect
             self._selected_island = None
 
     def update(self, dt: float) -> None:
@@ -111,34 +147,27 @@ class WorldMapScene:
     def draw(self, surface: pygame.Surface) -> None:
         self._draw_bg(surface)
 
-        # Paths between islands
         self._draw_paths(surface)
 
-        # Islands
         for island in self.levels_data["islands"]:
             self._draw_island(surface, island)
 
-        # Level panel for selected island
         if self._selected_island:
             self._draw_level_panel(surface)
 
-        # XP bar
         draw_xp_bar(surface, 180, 28, 460, 24,
                      self.progress["player_xp"],
                      self.progress["player_level"])
 
-        # Buttons
         self._back_btn.draw(surface)
         self._badge_btn.draw(surface)
 
-        # Title
         title = self._font_title.render("Kies een eiland!", True, TEXT_LIGHT)
         surface.blit(title, title.get_rect(
             center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 36)))
 
     # ------------------------------------------------------------------
     def _draw_bg(self, surface: pygame.Surface) -> None:
-        # Ocean gradient
         for y in range(SCREEN_HEIGHT):
             t = y / SCREEN_HEIGHT
             r = int(26 + t * 20)
@@ -146,8 +175,6 @@ class WorldMapScene:
             b = int(46 + t * 100)
             pygame.draw.line(surface, (r, g, b), (0, y), (SCREEN_WIDTH, y))
 
-        # Waves
-        wave_color = (40, 100, 160, 80)
         for i in range(5):
             offset = math.sin(self._anim_t * 0.8 + i * 1.2) * 8
             y0 = 150 + i * 120 + int(offset)
@@ -168,7 +195,6 @@ class WorldMapScene:
             color = (200, 200, 100) if unlocked else (80, 80, 100)
             pygame.draw.line(surface, color,
                               (p1[0], p1[1]), (p2[0], p2[1]), 4)
-            # Dots on path
             dx, dy = p2[0] - p1[0], p2[1] - p1[1]
             for step in [0.25, 0.5, 0.75]:
                 px = int(p1[0] + dx * step)
@@ -186,9 +212,7 @@ class WorldMapScene:
         cx, cy = rect.centerx, rect.centery
         r = 70
 
-        # Shadow
-        pygame.draw.circle(surface, (0, 0, 0, 80), (cx + 4, cy + 6), r)
-        # Island circle
+        pygame.draw.circle(surface, (0, 0, 0), (cx + 4, cy + 6), r)
         if sel:
             pulse = int(math.sin(self._anim_t * 4) * 5)
             pygame.draw.circle(surface, color, (cx, cy), r + pulse)
@@ -198,27 +222,21 @@ class WorldMapScene:
         else:
             pygame.draw.circle(surface, color, (cx, cy), r)
 
-        # Lock icon
         if not unlocked:
-            lock_font = get_font(36, header=True)
-            lock = lock_font.render("🔒", True, (160, 160, 180))
-            surface.blit(lock, lock.get_rect(center=(cx, cy - 8)))
+            # Draw geometric lock — no emoji
+            _draw_lock_icon(surface, cx, cy - 4, 26, (160, 160, 180))
         else:
-            # Count stars
             total_stars = self._island_stars(iid)
             total_lvls = len([l for isl in self.levels_data["islands"]
                                if isl["id"] == iid for l in isl["levels"]])
             if total_stars == total_lvls * 3:
-                crown = get_font(28, header=True).render("👑", True, (255, 220, 0))
-                surface.blit(crown, crown.get_rect(center=(cx, cy - r - 12)))
+                # Draw geometric crown above island — no emoji
+                _draw_crown_icon(surface, cx, cy - r - 22, 14, (255, 215, 0))
 
-        # Island name
-        name_font = self._font_island
         name_c = TEXT_LIGHT if unlocked else (120, 120, 140)
-        name_s = name_font.render(island["name"], True, name_c)
+        name_s = self._font_island.render(island["name"], True, name_c)
         surface.blit(name_s, name_s.get_rect(center=(cx, cy + r + 18)))
 
-        # Completed stars below name
         if unlocked:
             completed = sum(
                 1 for lv in [l for isl in self.levels_data["islands"]
@@ -242,7 +260,6 @@ class WorldMapScene:
         px = min(SCREEN_WIDTH - panel_w - 10, max(10, pos[0] - panel_w // 2))
         py = min(SCREEN_HEIGHT - panel_h - 10, max(70, pos[1] - panel_h // 2))
 
-        # Panel background
         pygame.draw.rect(surface, PANEL_BG,
                           (px, py, panel_w, panel_h), border_radius=20)
         pygame.draw.rect(surface, _ISLAND_COLORS.get(self._selected_island, PRIMARY),
@@ -262,22 +279,18 @@ class WorldMapScene:
             completed = self.progress["levels_completed"].get(key, {})
             stars = completed.get("stars", 0)
 
-            btn_color = SECONDARY if unlocked else LOCKED_COLOR
-            if not unlocked:
-                btn_color = (70, 70, 90)
-
+            btn_color = SECONDARY if unlocked else (70, 70, 90)
             pygame.draw.rect(surface, btn_color, btn_rect, border_radius=12)
 
-            # Level title
-            lv_font = self._font_level
             lv_text = f"{lv['id']}. {lv['title']}"
-            lv_s = lv_font.render(lv_text, True,
-                                   TEXT_LIGHT if unlocked else (100, 100, 120))
+            lv_s = self._font_level.render(lv_text, True,
+                                            TEXT_LIGHT if unlocked else (100, 100, 120))
             surface.blit(lv_s, (btn_rect.x + 12, btn_rect.y + 8))
 
             if not unlocked:
-                lock = get_font(20, header=True).render("🔒", True, (120, 120, 140))
-                surface.blit(lock, (btn_rect.right - 34, btn_rect.y + 22))
+                # Draw small geometric lock — no emoji
+                _draw_lock_icon(surface, btn_rect.right - 24, btn_rect.centery,
+                                 12, (120, 120, 140))
             elif stars > 0:
                 draw_stars(surface, btn_rect.right - 60, btn_rect.y + 48,
                             stars, 3, size=12, gap=4)
