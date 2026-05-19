@@ -14,6 +14,7 @@ export interface Level {
   base_block?: string
   correct_count?: number
   character_actions?: string[]
+  banana_high?: boolean
   max_stars: number
   star_thresholds: { '3': number; '2': number; '1': number }
   xp: number

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import Character from '../components/Character'
 import { Island, Level, LevelResult } from '../types'
 import { BLOCK_COLORS, ISLAND_ICONS } from '../config'
@@ -37,11 +37,8 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
   const gameAreaRef  = useRef<HTMLDivElement>(null)
   const [gameDims, setGameDims] = useState({ w: 320, h: 200 })
 
-  // Banana is high when level requires a jump
-  const bananaHigh = useMemo(
-    () => (level.character_actions ?? []).includes('jump'),
-    [level]
-  )
+  // Banana is high only when the level explicitly says so
+  const bananaHigh = level.banana_high ?? false
 
   // Sequence state
   const [program, setProgram]   = useState<string[]>([])
