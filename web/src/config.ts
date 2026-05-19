@@ -23,8 +23,8 @@ export const MAX_PLAYER_LEVEL = 10
 
 export const ISLAND_ICONS: Record<number, string> = {
   1: '🍌',
-  2: '🥥',
-  3: '🐟',
+  2: '🍌',  // island 2 blocks all say "banaan"
+  3: '🐟',  // island 3 blocks say "pak de vis"
 }
 
 export const BADGE_DEFS: Record<string, { name: string; desc: string; icon: string; color: string }> = {
