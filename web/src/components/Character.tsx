@@ -13,7 +13,7 @@ const Character: React.FC<Props> = ({ action = 'idle', flipX = false, size = 110
     dance:       { animation: 'dance 0.5s ease-in-out infinite' },
     'walk-right':{ animation: 'bounce-idle 0.4s ease-in-out infinite' },
     'walk-left': { animation: 'bounce-idle 0.4s ease-in-out infinite' },
-    jump:        { animation: 'none', transform: 'translateY(-40px)' },
+    jump:        { animation: 'none' },
     grab:        { animation: 'none' },
   }
 
