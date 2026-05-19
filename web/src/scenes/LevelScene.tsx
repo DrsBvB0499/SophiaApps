@@ -1,0 +1,532 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import Character from '../components/Character'
+import { Island, Level, LevelResult } from '../types'
+import { BLOCK_COLORS, ISLAND_ICONS } from '../config'
+import { sounds } from '../sounds'
+
+interface Props {
+  island: Island
+  level: Level
+  onComplete: (result: LevelResult) => void
+  onBack: () => void
+}
+
+type CharAction = 'idle' | 'walk-right' | 'walk-left' | 'jump' | 'grab' | 'dance'
+type FeedbackKind = 'correct' | 'wrong' | ''
+
+const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
+  const [mistakes, setMistakes]   = useState(0)
+  const [feedback, setFeedback]   = useState<FeedbackKind>('')
+  const [running, setRunning]     = useState(false)
+  const [charAction, setCharAction] = useState<CharAction>('idle')
+  const [charX, setCharX]         = useState(0)
+  const [flipChar, setFlipChar]   = useState(false)
+  const startTime = useRef(Date.now())
+  const feedbackTimer = useRef<ReturnType<typeof setTimeout>>()
+
+  // Sequence state
+  const [program, setProgram]   = useState<string[]>([])
+  const [available, setAvailable] = useState<string[]>(level.available_blocks ?? [])
+
+  // Choice state
+  const [choiceAnswered, setChoiceAnswered] = useState(false)
+  const [choiceResult, setChoiceResult]     = useState<'correct' | 'wrong' | ''>('')
+
+  // Debug state
+  const [debugAnswered, setDebugAnswered] = useState(false)
+  const [clickedDebugIdx, setClickedDebugIdx] = useState<number | null>(null)
+
+  // Loop state
+  const [selectedCount, setSelectedCount] = useState(1)
+
+  // Reset when level changes
+  useEffect(() => {
+    setMistakes(0); setFeedback(''); setRunning(false)
+    setCharAction('idle'); setCharX(0); setFlipChar(false)
+    setProgram([]); setAvailable(level.available_blocks ?? [])
+    setChoiceAnswered(false); setChoiceResult('')
+    setDebugAnswered(false); setClickedDebugIdx(null)
+    setSelectedCount(1)
+    startTime.current = Date.now()
+  }, [level])
+
+  const showFeedback = useCallback((kind: FeedbackKind, mistakes_: number = mistakes) => {
+    setFeedback(kind)
+    clearTimeout(feedbackTimer.current)
+    if (kind === 'correct') {
+      sounds.correct()
+    } else {
+      sounds.wrong()
+      setMistakes(mistakes_ + 1)
+    }
+    feedbackTimer.current = setTimeout(() => setFeedback(''), kind === 'wrong' ? 1500 : 800)
+  }, [mistakes])
+
+  const runAnimation = useCallback((onDone: () => void) => {
+    setRunning(true)
+    setCharX(0)
+    const actions = level.character_actions ?? []
+    if (actions.length === 0) { setTimeout(onDone, 300); return }
+
+    let step = 0
+    let currentX = 0
+    const STEP_MS = 600
+
+    const next = () => {
+      if (step >= actions.length) {
+        setCharAction('idle')
+        setRunning(false)
+        onDone()
+        return
+      }
+      const a = actions[step++]
+      if (a === 'move_right') { setFlipChar(false); setCharAction('walk-right'); currentX += 90; setCharX(currentX) }
+      else if (a === 'move_left') { setFlipChar(true); setCharAction('walk-left'); currentX -= 90; setCharX(currentX) }
+      else if (a === 'jump')  { setCharAction('jump') }
+      else if (a === 'grab')  { setCharAction('grab') }
+      setTimeout(next, STEP_MS)
+    }
+    next()
+  }, [level])
+
+  const finishLevel = useCallback(() => {
+    const elapsed = (Date.now() - startTime.current) / 1000
+    const thresh = level.star_thresholds
+    const m = mistakes
+    const stars = m <= thresh['3'] ? 3 : m <= thresh['2'] ? 2 : 1
+    const xpBase = level.xp
+    const xp = stars === 3 ? xpBase : stars === 2 ? Math.floor(xpBase * 2 / 3) : Math.floor(xpBase / 2)
+    onComplete({ island_id: island.id, level_id: level.id, stars, xp, time: elapsed, mistakes: m })
+  }, [island, level, mistakes, onComplete])
+
+  // ── Sequence ────────────────────────────────────────────────────
+  function addBlock(label: string) {
+    setProgram(p => [...p, label])
+    setAvailable(a => { const i = a.indexOf(label); return [...a.slice(0, i), ...a.slice(i + 1)] })
+  }
+  function removeBlock(idx: number) {
+    const label = program[idx]
+    setProgram(p => p.filter((_, i) => i !== idx))
+    setAvailable(a => [...a, label])
+  }
+  function runSequence() {
+    if (program.join(',') === (level.correct_sequence ?? []).join(',')) {
+      showFeedback('correct', mistakes)
+      setTimeout(() => runAnimation(finishLevel), 900)
+    } else {
+      showFeedback('wrong')
+    }
+  }
+
+  // ── Choice ──────────────────────────────────────────────────────
+  function chooseOption(opt: string) {
+    if (choiceAnswered) return
+    setChoiceAnswered(true)
+    if (opt === level.correct_block) {
+      setChoiceResult('correct')
+      showFeedback('correct', mistakes)
+      setTimeout(() => runAnimation(finishLevel), 900)
+    } else {
+      setChoiceResult('wrong')
+      showFeedback('wrong')
+    }
+  }
+
+  // ── Debug ───────────────────────────────────────────────────────
+  function clickDebugBlock(idx: number) {
+    if (debugAnswered) return
+    setDebugAnswered(true)
+    setClickedDebugIdx(idx)
+    if (idx === level.wrong_index) {
+      showFeedback('correct', mistakes)
+      setTimeout(() => runAnimation(finishLevel), 900)
+    } else {
+      showFeedback('wrong')
+    }
+  }
+
+  // ── Loop ────────────────────────────────────────────────────────
+  function runLoop() {
+    if (selectedCount === level.correct_count) {
+      showFeedback('correct', mistakes)
+      setTimeout(() => runAnimation(finishLevel), 900)
+    } else {
+      showFeedback('wrong')
+    }
+  }
+
+  const islandColor = island.color
+
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', height: '100vh',
+      background: 'linear-gradient(180deg, #1A1A2E 0%, #1A2040 100%)',
+      overflow: 'hidden',
+    }}>
+      {/* ── Header ───────────────────────────────────────────────── */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px',
+        background: 'rgba(0,0,0,0.4)', borderBottom: '2px solid rgba(100,100,200,0.3)',
+        flexShrink: 0,
+      }}>
+        <button className="btn btn-panel btn-sm" onClick={() => { sounds.click(); onBack() }}>← Terug</button>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '0.8rem', color: islandColor, fontFamily: 'var(--font-head)' }}>
+            {ISLAND_ICONS[island.id]} {island.name}
+          </div>
+          <div style={{ fontFamily: 'var(--font-head)', fontSize: '1.15rem' }}>{level.title}</div>
+        </div>
+        <div style={{
+          background: 'rgba(255,255,255,0.1)', borderRadius: 8,
+          padding: '4px 12px', fontSize: '0.85rem',
+        }}>
+          {level.type === 'sequence' && '🔢 Volgorde'}
+          {level.type === 'choice'   && '❓ Keuze'}
+          {level.type === 'debug'    && '🐛 Fout zoeken'}
+          {level.type === 'loop'     && '🔄 Herhaling'}
+        </div>
+      </div>
+
+      {/* ── Instruction ─────────────────────────────────────────── */}
+      <div style={{
+        margin: '10px 14px 0',
+        padding: '12px 18px',
+        background: 'rgba(247,183,49,0.15)',
+        border: '2px solid var(--primary)',
+        borderRadius: 14,
+        flexShrink: 0,
+      }}>
+        <p style={{ fontFamily: 'var(--font-head)', fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', lineHeight: 1.4 }}>
+          {level.instruction}
+        </p>
+      </div>
+
+      {/* ── Game area — character + target ──────────────────────── */}
+      <div style={{
+        margin: '10px 14px 0',
+        height: '26vh', minHeight: 160, flexShrink: 0,
+        background: 'rgba(30,50,80,0.6)',
+        border: '2px solid rgba(80,120,180,0.4)',
+        borderRadius: 14,
+        position: 'relative', overflow: 'hidden',
+        display: 'flex', alignItems: 'flex-end',
+      }}>
+        {/* Ground */}
+        <div style={{
+          position: 'absolute', bottom: 24, left: 16, right: 16,
+          height: 3, background: '#4a7a3a', borderRadius: 2,
+        }}/>
+
+        {/* Clouds (decorative) */}
+        {[20, 55, 80].map((x, i) => (
+          <div key={i} style={{
+            position: 'absolute', top: `${15 + i * 12}%`, left: `${x}%`,
+            width: 60, height: 22,
+            background: 'rgba(255,255,255,0.08)',
+            borderRadius: 20,
+          }}/>
+        ))}
+
+        {/* Target item */}
+        <div style={{
+          position: 'absolute', right: 32, bottom: 30,
+          fontSize: 'clamp(2rem, 5vw, 3rem)',
+          filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))',
+          transition: 'transform 0.3s',
+          transform: running && charX > 120 ? 'scale(0) rotate(180deg)' : 'scale(1)',
+        }}>
+          {ISLAND_ICONS[island.id] ?? '🍌'}
+        </div>
+
+        {/* Character */}
+        <div style={{
+          position: 'absolute', bottom: 26,
+          left: 40,
+          transition: 'transform 0.5s ease',
+          transform: `translateX(${charX}px)`,
+        }}>
+          <Character action={charAction} flipX={flipChar} size={90}/>
+        </div>
+      </div>
+
+      {/* ── Level UI (scrollable, can't overlap game area) ────────── */}
+      <div className="scrollable" style={{
+        flex: 1, margin: '0 14px', padding: '12px 0',
+        minHeight: 0,
+      }}>
+        {level.type === 'sequence' && (
+          <SequenceUI
+            program={program} available={available} disabled={running}
+            onAdd={addBlock} onRemove={removeBlock}
+          />
+        )}
+        {level.type === 'choice' && (
+          <ChoiceUI
+            prefix={level.program_prefix ?? []}
+            suffix={level.program_suffix ?? []}
+            options={level.options ?? []}
+            answered={choiceAnswered}
+            choiceResult={choiceResult}
+            correctBlock={level.correct_block ?? ''}
+            disabled={running}
+            onChoose={chooseOption}
+          />
+        )}
+        {level.type === 'debug' && (
+          <DebugUI
+            blocks={level.program ?? []}
+            wrongIndex={level.wrong_index ?? 0}
+            answered={debugAnswered}
+            clickedIdx={clickedDebugIdx}
+            disabled={running}
+            onClickBlock={clickDebugBlock}
+          />
+        )}
+        {level.type === 'loop' && (
+          <LoopUI
+            baseBlock={level.base_block ?? ''}
+            selectedCount={selectedCount}
+            disabled={running}
+            onSelect={setSelectedCount}
+          />
+        )}
+      </div>
+
+      {/* ── Run button (sequence + loop only) ─────────────────────── */}
+      {(level.type === 'sequence' || level.type === 'loop') && (
+        <div style={{
+          padding: '10px 14px 16px',
+          flexShrink: 0,
+          borderTop: '2px solid rgba(100,100,200,0.2)',
+        }}>
+          <button className="btn btn-green btn-lg" style={{ width: '100%' }}
+                  disabled={running || (level.type === 'sequence' && program.length === 0)}
+                  onClick={level.type === 'sequence' ? runSequence : runLoop}>
+            ▶ Uitvoeren!
+          </button>
+        </div>
+      )}
+
+      {/* ── Feedback banner ─────────────────────────────────────── */}
+      {feedback && (
+        <div className={`feedback-banner feedback-${feedback}`}>
+          {feedback === 'correct' ? 'Goed zo! 🎉' : 'Fout! Probeer opnieuw 💪'}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Sub-components ────────────────────────────────────────────────────────
+
+const SequenceUI: React.FC<{
+  program: string[]; available: string[]; disabled: boolean
+  onAdd: (l: string) => void; onRemove: (i: number) => void
+}> = ({ program, available, disabled, onAdd, onRemove }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    {/* Program zone */}
+    <div style={{
+      background: 'rgba(30,60,100,0.7)', border: '2px solid rgba(80,140,220,0.5)',
+      borderRadius: 12, padding: '12px 14px', minHeight: 90,
+    }}>
+      <div style={{ fontSize: '0.8rem', color: 'rgba(150,200,255,0.8)', marginBottom: 8,
+                    fontFamily: 'var(--font-head)' }}>
+        Jouw programma — klik een blok om te verwijderen:
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {program.length === 0 && (
+          <span style={{ color: 'rgba(150,160,180,0.6)', fontSize: '0.9rem', alignSelf: 'center' }}>
+            Klik hieronder op een blok om het toe te voegen...
+          </span>
+        )}
+        {program.map((label, i) => (
+          <button key={i} className="code-block" disabled={disabled}
+                  style={{ background: BLOCK_COLORS[(i + 3) % BLOCK_COLORS.length], color: '#1A1A2E' }}
+                  onClick={() => !disabled && onRemove(i)}>
+            {label} ✕
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* Available blocks */}
+    <div>
+      <div style={{ fontSize: '0.8rem', color: 'rgba(200,200,220,0.7)', marginBottom: 8,
+                    fontFamily: 'var(--font-head)' }}>
+        Beschikbare blokken:
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {available.map((label, i) => (
+          <button key={i} className="code-block" disabled={disabled}
+                  style={{ background: BLOCK_COLORS[i % BLOCK_COLORS.length], color: '#1A1A2E' }}
+                  onClick={() => !disabled && onAdd(label)}>
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+)
+
+const ChoiceUI: React.FC<{
+  prefix: string[]; suffix: string[]; options: string[]
+  answered: boolean; choiceResult: string; correctBlock: string; disabled: boolean
+  onChoose: (opt: string) => void
+}> = ({ prefix, suffix, options, answered, choiceResult, correctBlock, disabled, onChoose }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+    {/* Partial program display */}
+    <div style={{
+      background: 'rgba(30,60,100,0.6)', border: '2px solid rgba(80,140,220,0.4)',
+      borderRadius: 12, padding: '12px 14px',
+    }}>
+      <div style={{ fontSize: '0.8rem', color: 'rgba(150,200,255,0.8)', marginBottom: 8,
+                    fontFamily: 'var(--font-head)' }}>
+        Het programma — welk blok past op de lege plek?
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+        {prefix.map((label, i) => (
+          <span key={i} className="code-block disabled"
+                style={{ background: BLOCK_COLORS[i % BLOCK_COLORS.length], color: '#1A1A2E' }}>
+            {label}
+          </span>
+        ))}
+        {/* Blank slot */}
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          minWidth: 100, height: 56, borderRadius: 12,
+          border: '3px dashed var(--primary)',
+          background: answered ? 'rgba(32,191,107,0.2)' : 'rgba(247,183,49,0.1)',
+          fontFamily: 'var(--font-head)', fontSize: '1.4rem', color: 'var(--primary)',
+          transition: 'background 0.3s',
+        }}>
+          {answered ? correctBlock : '?'}
+        </span>
+        {suffix.map((label, i) => (
+          <span key={i} className="code-block disabled"
+                style={{ background: BLOCK_COLORS[(i + 2) % BLOCK_COLORS.length], color: '#1A1A2E' }}>
+            {label}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    {/* Options */}
+    <div>
+      <div style={{ fontSize: '0.8rem', color: 'rgba(200,200,220,0.7)', marginBottom: 10,
+                    fontFamily: 'var(--font-head)' }}>
+        Kies het juiste blok:
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {options.map((opt, i) => {
+          let bg = BLOCK_COLORS[i % BLOCK_COLORS.length]
+          if (answered) {
+            if (opt === correctBlock) bg = '#20BF6B'
+            else if (i === options.indexOf(opt) && choiceResult === 'wrong') bg = '#FC5C65'
+          }
+          return (
+            <button key={i} className="code-block"
+                    disabled={disabled || answered}
+                    style={{ background: bg, color: '#1A1A2E', width: '100%', justifyContent: 'center' }}
+                    onClick={() => onChoose(opt)}>
+              {opt}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  </div>
+)
+
+const DebugUI: React.FC<{
+  blocks: string[]; wrongIndex: number; answered: boolean
+  clickedIdx: number | null; disabled: boolean
+  onClickBlock: (i: number) => void
+}> = ({ blocks, wrongIndex, answered, clickedIdx, disabled, onClickBlock }) => (
+  <div>
+    <div style={{
+      background: 'rgba(252,92,101,0.1)', border: '2px solid rgba(252,92,101,0.4)',
+      borderRadius: 12, padding: '12px 14px', marginBottom: 12,
+    }}>
+      <p style={{ fontFamily: 'var(--font-head)', fontSize: '0.95rem', color: 'rgba(255,180,180,0.9)' }}>
+        🐛 Er zit een fout in dit programma! Klik op het foute blok.
+      </p>
+    </div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+      {blocks.map((label, i) => {
+        let bg = BLOCK_COLORS[i % BLOCK_COLORS.length]
+        let extra = ''
+        if (answered) {
+          if (i === wrongIndex)  { bg = '#FC5C65'; extra = ' ← FOUT' }
+          else { bg = '#20BF6B' }
+        } else if (clickedIdx === i && clickedIdx !== wrongIndex) {
+          bg = '#FC5C65'
+        }
+        return (
+          <button key={i} className="code-block"
+                  disabled={disabled || answered}
+                  style={{ background: bg, color: '#1A1A2E', transition: 'background 0.3s' }}
+                  onClick={() => !answered && onClickBlock(i)}>
+            {label}{extra}
+          </button>
+        )
+      })}
+    </div>
+  </div>
+)
+
+const LoopUI: React.FC<{
+  baseBlock: string; selectedCount: number; disabled: boolean
+  onSelect: (n: number) => void
+}> = ({ baseBlock, selectedCount, disabled, onSelect }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+    {/* Loop display */}
+    <div style={{
+      background: 'rgba(247,183,49,0.1)', border: '2px solid rgba(247,183,49,0.4)',
+      borderRadius: 12, padding: '14px',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        <span style={{ fontFamily: 'var(--font-head)', fontSize: '1.3rem', color: 'var(--primary)' }}>
+          HERHAAL
+        </span>
+        <span style={{
+          fontFamily: 'var(--font-head)', fontSize: '1.6rem', color: 'var(--secondary)',
+          background: 'rgba(32,191,107,0.2)', borderRadius: 8, padding: '0 12px',
+        }}>
+          {selectedCount}×
+        </span>
+        <span style={{ fontFamily: 'var(--font-head)', fontSize: '1rem', color: 'rgba(255,255,255,0.6)' }}>
+          keer:
+        </span>
+        <span className="code-block disabled"
+              style={{ background: BLOCK_COLORS[2], color: '#1A1A2E' }}>
+          {baseBlock}
+        </span>
+      </div>
+    </div>
+
+    {/* Count selector */}
+    <div>
+      <div style={{ fontSize: '0.85rem', color: 'rgba(200,200,220,0.7)', marginBottom: 10,
+                    fontFamily: 'var(--font-head)' }}>
+        Kies het aantal keer:
+      </div>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        {[1, 2, 3, 4, 5].map(n => (
+          <button key={n} className="btn" disabled={disabled}
+                  style={{
+                    width: 70, height: 70,
+                    background: n === selectedCount ? 'var(--primary)' : 'var(--secondary)',
+                    color: 'var(--text-dark)',
+                    fontFamily: 'var(--font-head)', fontSize: '1.6rem',
+                    border: n === selectedCount ? '3px solid white' : 'none',
+                  }}
+                  onClick={() => { sounds.click(); onSelect(n) }}>
+            {n}
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+)
+
+export default LevelScene

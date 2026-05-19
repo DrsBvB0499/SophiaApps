@@ -1,0 +1,169 @@
+{
+  "islands": [
+    {
+      "id": 1,
+      "name": "Bananeneiland",
+      "color": "#F7B731",
+      "position": [200, 400],
+      "unlocked": true,
+      "levels": [
+        {
+          "id": 1,
+          "title": "Eerste stappen",
+          "type": "sequence",
+          "instruction": "Help de aap naar de banaan! Zet de stappen in de goede volgorde.",
+          "available_blocks": ["Ga naar rechts", "Pak de banaan"],
+          "correct_sequence": ["Ga naar rechts", "Pak de banaan"],
+          "character_actions": ["move_right", "grab"],
+          "max_stars": 3,
+          "star_thresholds": {"3": 0, "2": 1, "1": 2},
+          "xp": 50
+        },
+        {
+          "id": 2,
+          "title": "Omweg",
+          "type": "sequence",
+          "instruction": "De banaan hangt hoog! Ga naar rechts en spring dan omhoog.",
+          "available_blocks": ["Spring omhoog", "Ga naar rechts", "Pak de banaan"],
+          "correct_sequence": ["Ga naar rechts", "Spring omhoog", "Pak de banaan"],
+          "character_actions": ["move_right", "jump", "grab"],
+          "max_stars": 3,
+          "star_thresholds": {"3": 0, "2": 1, "1": 2},
+          "xp": 60
+        },
+        {
+          "id": 3,
+          "title": "Welk blok?",
+          "type": "choice",
+          "instruction": "Welk blok hoort op de lege plek?",
+          "program_prefix": ["Ga naar rechts"],
+          "program_suffix": ["Pak de banaan"],
+          "correct_block": "Spring omhoog",
+          "options": ["Spring omhoog", "Ga naar links", "Slaap", "Ren snel"],
+          "character_actions": ["move_right", "jump", "grab"],
+          "max_stars": 3,
+          "star_thresholds": {"3": 0, "2": 1, "1": 2},
+          "xp": 60
+        },
+        {
+          "id": 4,
+          "title": "Vind de fout",
+          "type": "debug",
+          "instruction": "Er zit een fout in de code! Klik op het foute blok.",
+          "program": ["Ga naar rechts", "Ga naar links", "Pak de banaan"],
+          "wrong_index": 1,
+          "character_actions": ["move_right", "grab"],
+          "max_stars": 3,
+          "star_thresholds": {"3": 0, "2": 1, "1": 2},
+          "xp": 70
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Junglebos",
+      "color": "#20BF6B",
+      "position": [500, 280],
+      "unlocked": false,
+      "levels": [
+        {
+          "id": 1,
+          "title": "Door het bos",
+          "type": "sequence",
+          "instruction": "Help de aap door het bos! Zet de stappen in de goede volgorde.",
+          "available_blocks": ["Ga naar links", "Stap over steen", "Ga naar rechts", "Pak de banaan"],
+          "correct_sequence": ["Ga naar rechts", "Stap over steen", "Pak de banaan"],
+          "character_actions": ["move_right", "jump", "grab"],
+          "max_stars": 3,
+          "star_thresholds": {"3": 0, "2": 1, "1": 2},
+          "xp": 80
+        },
+        {
+          "id": 2,
+          "title": "Welke sprong?",
+          "type": "choice",
+          "instruction": "De aap moet over de rivier! Welk blok hoort hier?",
+          "program_prefix": ["Ga naar rechts"],
+          "program_suffix": ["Land veilig", "Pak de banaan"],
+          "correct_block": "Spring ver",
+          "options": ["Spring ver", "Stap opzij", "Ga terug", "Slaap"],
+          "character_actions": ["move_right", "jump", "grab"],
+          "max_stars": 3,
+          "star_thresholds": {"3": 0, "2": 1, "1": 2},
+          "xp": 80
+        },
+        {
+          "id": 3,
+          "title": "Jungle fout",
+          "type": "debug",
+          "instruction": "De aap raakt verdwaald! Klik op het foute blok.",
+          "program": ["Ga naar rechts", "Spring omhoog", "Ga naar links", "Pak de banaan"],
+          "wrong_index": 2,
+          "character_actions": ["move_right", "jump", "grab"],
+          "max_stars": 3,
+          "star_thresholds": {"3": 0, "2": 1, "1": 2},
+          "xp": 90
+        },
+        {
+          "id": 4,
+          "title": "Herhaling!",
+          "type": "loop",
+          "instruction": "De aap moet 3 stappen naar rechts. Gebruik de HERHAAL knop!",
+          "base_block": "Stap naar rechts",
+          "correct_count": 3,
+          "character_actions": ["move_right", "move_right", "move_right", "grab"],
+          "max_stars": 3,
+          "star_thresholds": {"3": 0, "2": 1, "1": 2},
+          "xp": 100
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "IJsberg",
+      "color": "#74B9FF",
+      "position": [760, 180],
+      "unlocked": false,
+      "levels": [
+        {
+          "id": 1,
+          "title": "Glad ijs",
+          "type": "sequence",
+          "instruction": "Het ijs is glad! Zet de stappen in de goede volgorde.",
+          "available_blocks": ["Schuif rechts", "Klim omhoog", "Pak de vis", "Schuif links"],
+          "correct_sequence": ["Schuif rechts", "Klim omhoog", "Pak de vis"],
+          "character_actions": ["move_right", "jump", "grab"],
+          "max_stars": 3,
+          "star_thresholds": {"3": 0, "2": 1, "1": 2},
+          "xp": 100
+        },
+        {
+          "id": 2,
+          "title": "IJsberg keuze",
+          "type": "choice",
+          "instruction": "Welk blok helpt de aap over de ijsberg?",
+          "program_prefix": ["Schuif rechts", "Schuif rechts"],
+          "program_suffix": ["Pak de vis"],
+          "correct_block": "Klim omhoog",
+          "options": ["Klim omhoog", "Spring terug", "Ga slapen", "Schuif links"],
+          "character_actions": ["move_right", "move_right", "jump", "grab"],
+          "max_stars": 3,
+          "star_thresholds": {"3": 0, "2": 1, "1": 2},
+          "xp": 100
+        },
+        {
+          "id": 3,
+          "title": "Dubbele herhaling",
+          "type": "loop",
+          "instruction": "De aap moet 4 stappen schuiven. Gebruik de HERHAAL knop!",
+          "base_block": "Schuif rechts",
+          "correct_count": 4,
+          "character_actions": ["move_right", "move_right", "move_right", "move_right", "grab"],
+          "max_stars": 3,
+          "star_thresholds": {"3": 0, "2": 1, "1": 2},
+          "xp": 110
+        }
+      ]
+    }
+  ]
+}
