@@ -237,6 +237,20 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
 
   const islandColor = island.color
 
+  // ── Island-specific scene colours ─────────────────────────────
+  const ISLAND_BG: Record<number, string> = {
+    1: 'linear-gradient(180deg, #87CEEB 0%, #b8dff0 55%, #7abb7a 100%)',
+    2: 'linear-gradient(180deg, #1a3a1a 0%, #2a5a2a 65%, #3a6a2a 100%)',
+    3: 'linear-gradient(180deg, #a0cce8 0%, #c0ddf0 55%, #d8eef8 100%)',
+  }
+  const GROUND_COLOR: Record<number, string>    = { 1: '#3a8a3a', 2: '#4a6a2a', 3: '#88b8d8' }
+  const GROUND_SHADOW: Record<number, string>   = { 1: '#2a5a2a', 2: '#2a4a1a', 3: '#5a88a8' }
+  const CLIFF_COLOR: Record<number, string>     = { 1: '#8B6040', 2: '#3a5a20', 3: '#4878b0' }
+  const CLIFF_TOP_COLOR: Record<number, string> = { 1: '#3a8a3a', 2: '#2a6a2a', 3: '#a0d0f0' }
+  const ROCK_COLOR: Record<number, string>      = { 1: '#7f8c8d', 2: '#5a7a4a', 3: '#8ab0d0' }
+
+  const hasJumpInPath = !bananaHigh && (level.character_actions ?? []).includes('jump')
+
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', height: '100vh',
@@ -281,33 +295,106 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
         </p>
       </div>
 
-      {/* ── Game area — character + target ──────────────────────── */}
+      {/* ── Game area ────────────────────────────────────────────── */}
       <div ref={gameAreaRef} style={{
         margin: '10px 14px 0',
         height: '26vh', minHeight: 160, flexShrink: 0,
-        background: 'rgba(30,50,80,0.6)',
-        border: '2px solid rgba(80,120,180,0.4)',
+        background: ISLAND_BG[island.id] ?? 'rgba(30,50,80,0.6)',
+        border: `2px solid ${island.color}66`,
         borderRadius: 14,
         position: 'relative', overflow: 'hidden',
-        display: 'flex', alignItems: 'flex-end',
       }}>
-        {/* Ground */}
-        <div style={{
-          position: 'absolute', bottom: 24, left: 16, right: 16,
-          height: 3, background: '#4a7a3a', borderRadius: 2,
-        }}/>
 
-        {/* Clouds (decorative) */}
-        {[20, 55, 80].map((x, i) => (
+        {/* ── Clouds ─────────────────────────────────────────── */}
+        {[18, 52, 78].map((x, i) => (
           <div key={i} style={{
-            position: 'absolute', top: `${15 + i * 12}%`, left: `${x}%`,
-            width: 60, height: 22,
-            background: 'rgba(255,255,255,0.08)',
+            position: 'absolute', top: `${8 + i * 9}%`, left: `${x}%`,
+            width: 55, height: 20,
+            background: island.id === 3 ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.18)',
             borderRadius: 20,
           }}/>
         ))}
 
-        {/* Target item — high or low depending on level */}
+        {/* ── Island-specific background decor ───────────────── */}
+        {island.id === 1 && <>
+          {/* Palm trunk */}
+          <div style={{ position:'absolute', bottom: 28, left: 14, width: 8, height: 52, background: '#6B4226', borderRadius: '4px 4px 0 0' }}/>
+          {/* Palm leaves */}
+          <div style={{ position:'absolute', bottom: 76, left: -4,  width: 38, height: 18, background: '#2d8a2d', borderRadius: '50% 50% 20% 20%', transform: 'rotate(-8deg)' }}/>
+          <div style={{ position:'absolute', bottom: 80, left:  8,  width: 30, height: 14, background: '#38a838', borderRadius: '50% 50% 20% 20%', transform: 'rotate(12deg)' }}/>
+        </>}
+        {island.id === 2 && <>
+          {/* Left jungle tree */}
+          <div style={{ position:'absolute', bottom: 28, left: 6,  width: 10, height: 80, background: '#3a2510', borderRadius: '5px 5px 0 0' }}/>
+          <div style={{ position:'absolute', bottom: 96, left: -10, width: 48, height: 32, background: '#1a5a1a', borderRadius: '50%' }}/>
+          {/* Smaller tree */}
+          <div style={{ position:'absolute', bottom: 28, left: 28, width: 7,  height: 52, background: '#3a2510', borderRadius: '3px 3px 0 0' }}/>
+          <div style={{ position:'absolute', bottom: 72, left: 14,  width: 34, height: 24, background: '#1a6a1a', borderRadius: '50%' }}/>
+        </>}
+        {island.id === 3 && <>
+          {/* Snow mounds on edges */}
+          <div style={{ position:'absolute', bottom: 25, left: -4,  width: 64, height: 20, background: '#ddeeff', borderRadius: '50% 50% 0 0', opacity: 0.85 }}/>
+          <div style={{ position:'absolute', bottom: 25, left: 50,  width: 44, height: 14, background: '#cce4f4', borderRadius: '50% 50% 0 0', opacity: 0.7  }}/>
+        </>}
+
+        {/* ── Cliff (banana is high — monkey must jump up) ────── */}
+        {bananaHigh && (
+          <div style={{
+            position: 'absolute',
+            top: BANANA_TOP_HIGH + 28,
+            bottom: 28,
+            right: 0,
+            width: 72,
+            background: CLIFF_COLOR[island.id] ?? '#8B6040',
+            borderRadius: '6px 6px 0 0',
+          }}>
+            {/* Cliff top surface */}
+            <div style={{
+              position: 'absolute', top: -9, left: -5, right: -5, height: 11,
+              background: CLIFF_TOP_COLOR[island.id] ?? '#3a8a3a',
+              borderRadius: '4px 4px 0 0',
+            }}/>
+            {/* Rock texture lines */}
+            {[12, 26, 40].map(t => (
+              <div key={t} style={{ position:'absolute', top: t, left: 8, right: 8, height: 2, background: 'rgba(0,0,0,0.18)', borderRadius: 1 }}/>
+            ))}
+          </div>
+        )}
+
+        {/* ── Stones (jump over obstacle mid-path) ───────────── */}
+        {hasJumpInPath && (
+          <div style={{ position: 'absolute', bottom: 28, left: '38%' }}>
+            {/* Main boulder */}
+            <div style={{
+              width: 38, height: 26,
+              background: ROCK_COLOR[island.id] ?? '#7f8c8d',
+              borderRadius: '50% 50% 40% 40%',
+              boxShadow: 'inset 0 -4px 0 rgba(0,0,0,0.25)',
+              position: 'relative',
+            }}>
+              <div style={{ position:'absolute', top: 5, left: 8, width: 10, height: 6, background: 'rgba(255,255,255,0.22)', borderRadius: '50%' }}/>
+            </div>
+            {/* Smaller pebble beside it */}
+            <div style={{
+              position: 'absolute', bottom: 0, right: -20,
+              width: 22, height: 15,
+              background: ROCK_COLOR[island.id] ?? '#7f8c8d',
+              borderRadius: '50% 50% 40% 40%',
+              filter: 'brightness(0.82)',
+            }}/>
+          </div>
+        )}
+
+        {/* ── Ground line ─────────────────────────────────────── */}
+        <div style={{
+          position: 'absolute', bottom: 25, left: 14, right: 14,
+          height: 4,
+          background: GROUND_COLOR[island.id] ?? '#4a7a3a',
+          borderRadius: 2,
+          boxShadow: `0 2px 0 ${GROUND_SHADOW[island.id] ?? '#2a5a2a'}`,
+        }}/>
+
+        {/* ── Target item ─────────────────────────────────────── */}
         <div style={{
           position: 'absolute',
           right: BANANA_RIGHT,
@@ -318,35 +405,31 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
           transform: bananaEaten ? 'scale(0) rotate(180deg)' : 'scale(1)',
           opacity: bananaEaten ? 0 : 1,
           userSelect: 'none',
+          zIndex: 2,
         }}>
           {ISLAND_ICONS[island.id] ?? '🍌'}
         </div>
 
-        {/* "Yum!" bubble */}
+        {/* ── "Lekker!" bubble ─────────────────────────────────── */}
         {showYum && (
           <div style={{
             position: 'absolute',
             right: BANANA_RIGHT + 10,
-            ...(bananaHigh ? { top: BANANA_TOP_HIGH - 30 } : { bottom: 70 }),
-            fontFamily: 'var(--font-head)',
-            fontSize: '1.4rem',
-            color: '#FFD700',
-            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-            animation: 'pop-in 0.2s ease',
-            pointerEvents: 'none',
-            zIndex: 10,
+            ...(bananaHigh ? { top: BANANA_TOP_HIGH - 32 } : { bottom: 72 }),
+            fontFamily: 'var(--font-head)', fontSize: '1.4rem',
+            color: '#FFD700', textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+            animation: 'pop-in 0.2s ease', pointerEvents: 'none', zIndex: 10,
           }}>
             😋 Lekker!
           </div>
         )}
 
-        {/* Character */}
+        {/* ── Character ────────────────────────────────────────── */}
         <div style={{
-          position: 'absolute',
-          bottom: CHAR_BOTTOM,
-          left: CHAR_LEFT,
+          position: 'absolute', bottom: CHAR_BOTTOM, left: CHAR_LEFT,
           transition: 'transform 0.5s ease',
           transform: `translateX(${charX}px) translateY(${charY}px)`,
+          zIndex: 3,
         }}>
           <Character action={charAction} flipX={flipChar} size={CHAR_WIDTH}/>
         </div>
