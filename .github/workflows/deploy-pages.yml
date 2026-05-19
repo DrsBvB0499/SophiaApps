@@ -1,9 +1,8 @@
 name: Deploy CodeAap Web to GitHub Pages
-# re-trigger after GitHub Pages source was set to GitHub Actions
 
 on:
   push:
-    branches: ["claude/codeaap-kids-app-QcnBO", "main"]
+    branches: ["main"]
     paths: ["web/**", ".github/workflows/deploy-pages.yml"]
   workflow_dispatch:
 
