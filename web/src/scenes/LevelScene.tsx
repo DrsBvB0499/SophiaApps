@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Character from '../components/Character'
 import { Island, Level, LevelResult } from '../types'
 import { BLOCK_COLORS, ISLAND_ICONS } from '../config'
@@ -14,15 +14,34 @@ interface Props {
 type CharAction = 'idle' | 'walk-right' | 'walk-left' | 'jump' | 'grab' | 'dance'
 type FeedbackKind = 'correct' | 'wrong' | ''
 
+// Character size constants (size prop = 90)
+const CHAR_WIDTH  = 90
+const CHAR_HEIGHT = 90 * 1.25  // 112.5
+const CHAR_LEFT   = 40         // left: 40 in game area
+const CHAR_BOTTOM = 26         // bottom: 26 in game area
+const BANANA_RIGHT = 32        // right: 32 in game area
+const BANANA_TOP_HIGH = 18     // top: 18 when banana is high
+
 const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
   const [mistakes, setMistakes]   = useState(0)
   const [feedback, setFeedback]   = useState<FeedbackKind>('')
   const [running, setRunning]     = useState(false)
   const [charAction, setCharAction] = useState<CharAction>('idle')
   const [charX, setCharX]         = useState(0)
+  const [charY, setCharY]         = useState(0)   // negative = up
   const [flipChar, setFlipChar]   = useState(false)
+  const [bananaEaten, setBananaEaten] = useState(false)
+  const [showYum, setShowYum]         = useState(false)
   const startTime = useRef(Date.now())
   const feedbackTimer = useRef<ReturnType<typeof setTimeout>>()
+  const gameAreaRef  = useRef<HTMLDivElement>(null)
+  const [gameDims, setGameDims] = useState({ w: 320, h: 200 })
+
+  // Banana is high when level requires a jump
+  const bananaHigh = useMemo(
+    () => (level.character_actions ?? []).includes('jump'),
+    [level]
+  )
 
   // Sequence state
   const [program, setProgram]   = useState<string[]>([])
@@ -39,10 +58,22 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
   // Loop state
   const [selectedCount, setSelectedCount] = useState(1)
 
+  // Measure game area
+  useEffect(() => {
+    const el = gameAreaRef.current
+    if (!el) return
+    const update = () => setGameDims({ w: el.clientWidth, h: el.clientHeight })
+    update()
+    const obs = new ResizeObserver(update)
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
   // Reset when level changes
   useEffect(() => {
     setMistakes(0); setFeedback(''); setRunning(false)
-    setCharAction('idle'); setCharX(0); setFlipChar(false)
+    setCharAction('idle'); setCharX(0); setCharY(0); setFlipChar(false)
+    setBananaEaten(false); setShowYum(false)
     setProgram([]); setAvailable(level.available_blocks ?? [])
     setChoiceAnswered(false); setChoiceResult('')
     setDebugAnswered(false); setClickedDebugIdx(null)
@@ -64,30 +95,79 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
 
   const runAnimation = useCallback((onDone: () => void) => {
     setRunning(true)
-    setCharX(0)
-    const actions = level.character_actions ?? []
-    if (actions.length === 0) { setTimeout(onDone, 300); return }
+    setCharX(0); setCharY(0); setBananaEaten(false)
 
+    // Strip explicit 'grab' from actions — we always end with our own eat sequence
+    const actions = (level.character_actions ?? []).filter(a => a !== 'grab')
+
+    // ── Step-size calculation ─────────────────────────────────────
+    // Monkey center starts at: CHAR_LEFT + CHAR_WIDTH/2
+    // Banana center at:        gameDims.w - BANANA_RIGHT - ~20 (half emoji)
+    const charCenterStart = CHAR_LEFT + CHAR_WIDTH / 2
+    const bananaCenterX   = gameDims.w - BANANA_RIGHT - 20
+    const totalDistX      = Math.max(80, bananaCenterX - charCenterStart)
+    const moveRightCount  = actions.filter(a => a === 'move_right').length
+    const stepX           = moveRightCount > 0 ? totalDistX / moveRightCount : totalDistX
+
+    // ── Jump height calculation ───────────────────────────────────
+    // When banana is at top: BANANA_TOP_HIGH from top of game area.
+    // Monkey head (top of SVG) at rest: gameDims.h - CHAR_BOTTOM - CHAR_HEIGHT from top.
+    // translateY needed to bring head to banana top:
+    //   charY = BANANA_TOP_HIGH - (gameDims.h - CHAR_BOTTOM - CHAR_HEIGHT)
+    //         = BANANA_TOP_HIGH - gameDims.h + CHAR_BOTTOM + CHAR_HEIGHT
+    const jumpY = bananaHigh
+      ? BANANA_TOP_HIGH - gameDims.h + CHAR_BOTTOM + CHAR_HEIGHT
+      : -45  // small decorative hop
+
+    const STEP_MS = 550
     let step = 0
     let currentX = 0
-    const STEP_MS = 600
+    let jumped = false
 
     const next = () => {
       if (step >= actions.length) {
-        setCharAction('idle')
-        setRunning(false)
-        onDone()
+        // ── End sequence: grab → eat → yum → dance ──────────────
+        setCharAction('grab')
+        setTimeout(() => {
+          setBananaEaten(true)
+          setShowYum(true)
+          sounds.win()
+          setTimeout(() => setShowYum(false), 1400)
+          setTimeout(() => {
+            setCharY(0)
+            setCharAction('dance')
+            setRunning(false)
+            onDone()
+          }, 650)
+        }, 480)
         return
       }
+
       const a = actions[step++]
-      if (a === 'move_right') { setFlipChar(false); setCharAction('walk-right'); currentX += 90; setCharX(currentX) }
-      else if (a === 'move_left') { setFlipChar(true); setCharAction('walk-left'); currentX -= 90; setCharX(currentX) }
-      else if (a === 'jump')  { setCharAction('jump') }
-      else if (a === 'grab')  { setCharAction('grab') }
+      if (a === 'move_right') {
+        setFlipChar(false); setCharAction('walk-right')
+        currentX += stepX; setCharX(currentX)
+      } else if (a === 'move_left') {
+        setFlipChar(true); setCharAction('walk-left')
+        currentX -= stepX; setCharX(currentX)
+      } else if (a === 'jump') {
+        setCharAction('jump')
+        setCharY(jumpY)
+        jumped = true
+        // Bounce back down only for decorative hops (not when reaching high banana)
+        if (!bananaHigh) setTimeout(() => setCharY(0), STEP_MS * 0.85)
+      }
       setTimeout(next, STEP_MS)
     }
-    next()
-  }, [level])
+
+    if (actions.length === 0) {
+      // No actions — just eat directly
+      setTimeout(next, 100)
+    } else {
+      next()
+    }
+    void jumped  // used implicitly via closure
+  }, [level, gameDims, bananaHigh])
 
   const finishLevel = useCallback(() => {
     const elapsed = (Date.now() - startTime.current) / 1000
@@ -202,7 +282,7 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
       </div>
 
       {/* ── Game area — character + target ──────────────────────── */}
-      <div style={{
+      <div ref={gameAreaRef} style={{
         margin: '10px 14px 0',
         height: '26vh', minHeight: 160, flexShrink: 0,
         background: 'rgba(30,50,80,0.6)',
@@ -227,25 +307,48 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
           }}/>
         ))}
 
-        {/* Target item */}
+        {/* Target item — high or low depending on level */}
         <div style={{
-          position: 'absolute', right: 32, bottom: 30,
+          position: 'absolute',
+          right: BANANA_RIGHT,
+          ...(bananaHigh ? { top: BANANA_TOP_HIGH } : { bottom: 30 }),
           fontSize: 'clamp(2rem, 5vw, 3rem)',
           filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))',
-          transition: 'transform 0.3s',
-          transform: running && charX > 120 ? 'scale(0) rotate(180deg)' : 'scale(1)',
+          transition: 'transform 0.3s ease, opacity 0.3s ease',
+          transform: bananaEaten ? 'scale(0) rotate(180deg)' : 'scale(1)',
+          opacity: bananaEaten ? 0 : 1,
+          userSelect: 'none',
         }}>
           {ISLAND_ICONS[island.id] ?? '🍌'}
         </div>
 
+        {/* "Yum!" bubble */}
+        {showYum && (
+          <div style={{
+            position: 'absolute',
+            right: BANANA_RIGHT + 10,
+            ...(bananaHigh ? { top: BANANA_TOP_HIGH - 30 } : { bottom: 70 }),
+            fontFamily: 'var(--font-head)',
+            fontSize: '1.4rem',
+            color: '#FFD700',
+            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+            animation: 'pop-in 0.2s ease',
+            pointerEvents: 'none',
+            zIndex: 10,
+          }}>
+            😋 Lekker!
+          </div>
+        )}
+
         {/* Character */}
         <div style={{
-          position: 'absolute', bottom: 26,
-          left: 40,
+          position: 'absolute',
+          bottom: CHAR_BOTTOM,
+          left: CHAR_LEFT,
           transition: 'transform 0.5s ease',
-          transform: `translateX(${charX}px)`,
+          transform: `translateX(${charX}px) translateY(${charY}px)`,
         }}>
-          <Character action={charAction} flipX={flipChar} size={90}/>
+          <Character action={charAction} flipX={flipChar} size={CHAR_WIDTH}/>
         </div>
       </div>
 
