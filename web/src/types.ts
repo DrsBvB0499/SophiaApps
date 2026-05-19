@@ -1,21 +1,45 @@
 export interface Level {
   id: number
   title: string
-  type: 'sequence' | 'choice' | 'debug' | 'loop'
+  type: 'sequence' | 'choice' | 'debug' | 'loop' | 'if_else' | 'variable' | 'function' | 'nested_loop'
   instruction: string
+  hint?: string
+  // sequence
   available_blocks?: string[]
   correct_sequence?: string[]
+  // choice
   program_prefix?: string[]
   program_suffix?: string[]
   correct_block?: string
   options?: string[]
+  // debug
   program?: string[]
   wrong_index?: number
+  // loop
   base_block?: string
   correct_count?: number
+  // if_else
+  condition_text?: string
+  if_options?: string[]
+  else_options?: string[]
+  correct_if?: string
+  correct_else?: string
+  // variable
+  variable_name?: string
+  correct_value?: number
+  // function
+  function_name?: string
+  function_options?: string[]
+  correct_function_body?: string[]
+  main_options?: string[]
+  correct_main?: string[]
+  // nested_loop
+  correct_outer?: number
+  correct_inner?: number
+  // animation
   character_actions?: string[]
   banana_high?: boolean
-  obstacle?: 'none' | 'stone' | 'river' | 'ice_mound'
+  obstacle?: 'none' | 'stone' | 'river' | 'ice_mound' | 'cactus' | 'coral' | 'asteroid' | 'lava_rock'
   max_stars: number
   star_thresholds: { '3': number; '2': number; '1': number }
   xp: number
