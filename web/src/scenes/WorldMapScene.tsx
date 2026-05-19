@@ -27,7 +27,7 @@ const WorldMapScene: React.FC<Props> = ({ progress, levelsData, onSelectLevel, o
 
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', height: '100vh',
+      display: 'flex', flexDirection: 'column', height: '100%',
       background: 'linear-gradient(180deg, #1A2A4A 0%, #1A3A5A 50%, #1A4A6A 100%)',
     }}>
       {/* Top bar */}

@@ -11,7 +11,7 @@ const AchievementsScene: React.FC<Props> = ({ progress, onBack }) => {
 
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', height: '100vh',
+      display: 'flex', flexDirection: 'column', height: '100%',
       background: 'linear-gradient(180deg, #1A1A2E 0%, #1A2040 100%)',
     }}>
       {/* Header */}

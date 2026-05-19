@@ -15,6 +15,7 @@ export interface Level {
   correct_count?: number
   character_actions?: string[]
   banana_high?: boolean
+  obstacle?: 'none' | 'stone' | 'river' | 'ice_mound'
   max_stars: number
   star_thresholds: { '3': number; '2': number; '1': number }
   xp: number

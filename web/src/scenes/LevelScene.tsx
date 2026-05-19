@@ -246,30 +246,30 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
   const CLIFF_TOP_COLOR: Record<number, string> = { 1: '#3a8a3a', 2: '#2a6a2a', 3: '#a0d0f0' }
   const ROCK_COLOR: Record<number, string>      = { 1: '#7f8c8d', 2: '#5a7a4a', 3: '#8ab0d0' }
 
-  const hasJumpInPath = !bananaHigh && (level.character_actions ?? []).includes('jump')
+  const obstacle = level.obstacle ?? 'none'
 
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', height: '100vh',
+      display: 'flex', flexDirection: 'column', height: '100%',
       background: 'linear-gradient(180deg, #1A1A2E 0%, #1A2040 100%)',
       overflow: 'hidden',
     }}>
       {/* ── Header ───────────────────────────────────────────────── */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px',
+        display: 'flex', alignItems: 'center', gap: 10, padding: '7px 12px',
         background: 'rgba(0,0,0,0.4)', borderBottom: '2px solid rgba(100,100,200,0.3)',
         flexShrink: 0,
       }}>
         <button className="btn btn-panel btn-sm" onClick={() => { sounds.click(); onBack() }}>← Terug</button>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '0.8rem', color: islandColor, fontFamily: 'var(--font-head)' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: '0.75rem', color: islandColor, fontFamily: 'var(--font-head)' }}>
             {ISLAND_ICONS[island.id]} {island.name}
           </div>
-          <div style={{ fontFamily: 'var(--font-head)', fontSize: '1.15rem' }}>{level.title}</div>
+          <div style={{ fontFamily: 'var(--font-head)', fontSize: '1.05rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{level.title}</div>
         </div>
         <div style={{
           background: 'rgba(255,255,255,0.1)', borderRadius: 8,
-          padding: '4px 12px', fontSize: '0.85rem',
+          padding: '3px 10px', fontSize: '0.8rem', whiteSpace: 'nowrap',
         }}>
           {level.type === 'sequence' && '🔢 Volgorde'}
           {level.type === 'choice'   && '❓ Keuze'}
@@ -280,22 +280,22 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
 
       {/* ── Instruction ─────────────────────────────────────────── */}
       <div style={{
-        margin: '10px 14px 0',
-        padding: '12px 18px',
+        margin: '6px 10px 0',
+        padding: '9px 14px',
         background: 'rgba(247,183,49,0.15)',
         border: '2px solid var(--primary)',
-        borderRadius: 14,
+        borderRadius: 12,
         flexShrink: 0,
       }}>
-        <p style={{ fontFamily: 'var(--font-head)', fontSize: 'clamp(1rem, 2.5vw, 1.25rem)', lineHeight: 1.4 }}>
+        <p style={{ fontFamily: 'var(--font-head)', fontSize: 'clamp(0.9rem, 2.5vw, 1.15rem)', lineHeight: 1.35 }}>
           {level.instruction}
         </p>
       </div>
 
       {/* ── Game area ────────────────────────────────────────────── */}
       <div ref={gameAreaRef} style={{
-        margin: '10px 14px 0',
-        height: '26vh', minHeight: 160, flexShrink: 0,
+        margin: '6px 10px 0',
+        height: '22vh', minHeight: 130, maxHeight: 210, flexShrink: 0,
         background: ISLAND_BG[island.id] ?? 'rgba(30,50,80,0.6)',
         border: `2px solid ${island.color}66`,
         borderRadius: 14,
@@ -337,59 +337,62 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
         {/* ── Cliff (banana is high — monkey must jump up) ────── */}
         {bananaHigh && (
           <div style={{
-            position: 'absolute',
-            top: BANANA_TOP_HIGH + 28,
-            bottom: 28,
-            right: 0,
-            width: 72,
+            position: 'absolute', top: BANANA_TOP_HIGH + 26, bottom: 26, right: 0, width: 72,
             background: CLIFF_COLOR[island.id] ?? '#8B6040',
             borderRadius: '6px 6px 0 0',
           }}>
-            {/* Cliff top surface */}
-            <div style={{
-              position: 'absolute', top: -9, left: -5, right: -5, height: 11,
-              background: CLIFF_TOP_COLOR[island.id] ?? '#3a8a3a',
-              borderRadius: '4px 4px 0 0',
-            }}/>
-            {/* Rock texture lines */}
-            {[12, 26, 40].map(t => (
-              <div key={t} style={{ position:'absolute', top: t, left: 8, right: 8, height: 2, background: 'rgba(0,0,0,0.18)', borderRadius: 1 }}/>
+            <div style={{ position:'absolute', top:-9, left:-5, right:-5, height:11, background: CLIFF_TOP_COLOR[island.id] ?? '#3a8a3a', borderRadius:'4px 4px 0 0' }}/>
+            {[10, 22, 34].map(t => (
+              <div key={t} style={{ position:'absolute', top:t, left:8, right:8, height:2, background:'rgba(0,0,0,0.18)', borderRadius:1 }}/>
             ))}
           </div>
         )}
 
-        {/* ── Stones (jump over obstacle mid-path) ───────────── */}
-        {hasJumpInPath && (
-          <div style={{ position: 'absolute', bottom: 28, left: '38%' }}>
-            {/* Main boulder */}
-            <div style={{
-              width: 38, height: 26,
-              background: ROCK_COLOR[island.id] ?? '#7f8c8d',
-              borderRadius: '50% 50% 40% 40%',
-              boxShadow: 'inset 0 -4px 0 rgba(0,0,0,0.25)',
-              position: 'relative',
-            }}>
-              <div style={{ position:'absolute', top: 5, left: 8, width: 10, height: 6, background: 'rgba(255,255,255,0.22)', borderRadius: '50%' }}/>
+        {/* ── Stones (jump over a boulder mid-path) ──────────── */}
+        {obstacle === 'stone' && (
+          <div style={{ position:'absolute', bottom:29, left:'38%' }}>
+            <div style={{ width:40, height:28, background: ROCK_COLOR[island.id] ?? '#7f8c8d', borderRadius:'50% 50% 40% 40%', boxShadow:'inset 0 -4px 0 rgba(0,0,0,0.25)', position:'relative' }}>
+              <div style={{ position:'absolute', top:5, left:8, width:11, height:7, background:'rgba(255,255,255,0.22)', borderRadius:'50%' }}/>
             </div>
-            {/* Smaller pebble beside it */}
-            <div style={{
-              position: 'absolute', bottom: 0, right: -20,
-              width: 22, height: 15,
-              background: ROCK_COLOR[island.id] ?? '#7f8c8d',
-              borderRadius: '50% 50% 40% 40%',
-              filter: 'brightness(0.82)',
-            }}/>
+            <div style={{ position:'absolute', bottom:0, right:-22, width:24, height:16, background: ROCK_COLOR[island.id] ?? '#7f8c8d', borderRadius:'50% 50% 40% 40%', filter:'brightness(0.82)' }}/>
           </div>
         )}
 
-        {/* ── Ground line ─────────────────────────────────────── */}
-        <div style={{
-          position: 'absolute', bottom: 25, left: 14, right: 14,
-          height: 4,
-          background: GROUND_COLOR[island.id] ?? '#4a7a3a',
-          borderRadius: 2,
-          boxShadow: `0 2px 0 ${GROUND_SHADOW[island.id] ?? '#2a5a2a'}`,
-        }}/>
+        {/* ── River (jump far over water gap) ─────────────────── */}
+        {obstacle === 'river' && <>
+          {/* Water body */}
+          <div style={{ position:'absolute', bottom:0, left:'30%', width:68, height:29, background:'linear-gradient(180deg,#4a9fd4 0%,#2a6fa0 100%)', borderRadius:'0 0 4px 4px', overflow:'hidden' }}>
+            {/* Ripples */}
+            <div style={{ position:'absolute', top:6,  left:6,  right:6,  height:3, background:'rgba(255,255,255,0.28)', borderRadius:2 }}/>
+            <div style={{ position:'absolute', top:14, left:12, right:12, height:2, background:'rgba(255,255,255,0.18)', borderRadius:2 }}/>
+            <div style={{ position:'absolute', top:21, left:8,  right:8,  height:2, background:'rgba(255,255,255,0.12)', borderRadius:2 }}/>
+          </div>
+          {/* Left bank */}
+          <div style={{ position:'absolute', bottom:26, left:'30%', width:6, height:8, background: GROUND_COLOR[island.id] ?? '#4a7a3a', borderRadius:'2px 0 0 2px' }}/>
+          {/* Right bank */}
+          <div style={{ position:'absolute', bottom:26, left:'calc(30% + 62px)', width:6, height:8, background: GROUND_COLOR[island.id] ?? '#4a7a3a', borderRadius:'0 2px 2px 0' }}/>
+        </>}
+
+        {/* ── Ice mound (climb/jump over iceberg) ─────────────── */}
+        {obstacle === 'ice_mound' && (
+          <div style={{ position:'absolute', bottom:29, left:'36%' }}>
+            {/* Main mound */}
+            <div style={{ width:54, height:40, background:'linear-gradient(135deg,#c8e8f8 0%,#6090c0 100%)', borderRadius:'50% 50% 20% 20%', position:'relative', boxShadow:'0 -2px 0 rgba(255,255,255,0.6)' }}>
+              <div style={{ position:'absolute', top:6, left:10, width:14, height:9, background:'rgba(255,255,255,0.45)', borderRadius:'50%' }}/>
+              <div style={{ position:'absolute', top:4, left:30, width:7, height:5, background:'rgba(255,255,255,0.3)', borderRadius:'50%' }}/>
+            </div>
+            {/* Smaller chunk beside it */}
+            <div style={{ position:'absolute', bottom:0, right:-26, width:28, height:18, background:'linear-gradient(135deg,#b8d8f0 0%,#5080b0 100%)', borderRadius:'50% 50% 20% 20%', filter:'brightness(0.9)' }}/>
+          </div>
+        )}
+
+        {/* ── Ground line (split around river gap) ────────────── */}
+        {obstacle === 'river' ? <>
+          <div style={{ position:'absolute', bottom:26, left:14, width:'30%', height:4, background: GROUND_COLOR[island.id] ?? '#4a7a3a', borderRadius:2, boxShadow:`0 2px 0 ${GROUND_SHADOW[island.id] ?? '#2a5a2a'}` }}/>
+          <div style={{ position:'absolute', bottom:26, left:'calc(30% + 68px)', right: bananaHigh ? 72 : 14, height:4, background: GROUND_COLOR[island.id] ?? '#4a7a3a', borderRadius:2, boxShadow:`0 2px 0 ${GROUND_SHADOW[island.id] ?? '#2a5a2a'}` }}/>
+        </> : (
+          <div style={{ position:'absolute', bottom:26, left:14, right: bananaHigh ? 72 : 14, height:4, background: GROUND_COLOR[island.id] ?? '#4a7a3a', borderRadius:2, boxShadow:`0 2px 0 ${GROUND_SHADOW[island.id] ?? '#2a5a2a'}` }}/>
+        )}
 
         {/* ── Target item ─────────────────────────────────────── */}
         <div style={{
@@ -434,7 +437,7 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
 
       {/* ── Level UI (scrollable, can't overlap game area) ────────── */}
       <div className="scrollable" style={{
-        flex: 1, margin: '0 14px', padding: '12px 0',
+        flex: 1, margin: '0 10px', padding: '10px 0',
         minHeight: 0,
       }}>
         {level.type === 'sequence' && (
@@ -478,7 +481,7 @@ const LevelScene: React.FC<Props> = ({ island, level, onComplete, onBack }) => {
       {/* ── Run button (sequence + loop only) ─────────────────────── */}
       {(level.type === 'sequence' || level.type === 'loop') && (
         <div style={{
-          padding: '10px 14px 16px',
+          padding: '8px 10px 12px',
           flexShrink: 0,
           borderTop: '2px solid rgba(100,100,200,0.2)',
         }}>
