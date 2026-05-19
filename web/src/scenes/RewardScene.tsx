@@ -62,7 +62,7 @@ const RewardScene: React.FC<Props> = ({
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      justifyContent: 'flex-start', height: '100vh', overflowY: 'auto',
+      justifyContent: 'flex-start', height: '100%', overflowY: 'auto',
       background: 'radial-gradient(ellipse at 50% 0%, #2A3A6E 0%, #1A1A2E 80%)',
       padding: '24px 20px 32px',
       gap: 20, textAlign: 'center',

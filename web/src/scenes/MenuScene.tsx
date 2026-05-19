@@ -28,7 +28,7 @@ const MenuScene: React.FC<Props> = ({ progress, onUpdateName, onPlay, onBadges }
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      justifyContent: 'center', height: '100vh', gap: '24px',
+      justifyContent: 'center', height: '100%', gap: '24px',
       background: 'radial-gradient(ellipse at 50% 0%, #2A2A6E 0%, #1A1A2E 70%)',
       padding: '24px',
     }}>
