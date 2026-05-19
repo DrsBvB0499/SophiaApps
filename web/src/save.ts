@@ -97,6 +97,26 @@ function checkBadges(p: Progress, result: LevelResult, levelsData: LevelsData): 
   )
   if (loopDone) earn('loop_master')
 
+  const ifDone = levelsData.islands.some(isl =>
+    isl.levels.some(lv => lv.type === 'if_else' && p.levels_completed[`${isl.id}-${lv.id}`])
+  )
+  if (ifDone) earn('if_master')
+
+  const varDone = levelsData.islands.some(isl =>
+    isl.levels.some(lv => lv.type === 'variable' && p.levels_completed[`${isl.id}-${lv.id}`])
+  )
+  if (varDone) earn('variable_master')
+
+  const funcDone = levelsData.islands.some(isl =>
+    isl.levels.some(lv => lv.type === 'function' && p.levels_completed[`${isl.id}-${lv.id}`])
+  )
+  if (funcDone) earn('function_master')
+
+  const nestedDone = levelsData.islands.some(isl =>
+    isl.levels.some(lv => lv.type === 'nested_loop' && p.levels_completed[`${isl.id}-${lv.id}`])
+  )
+  if (nestedDone) earn('nested_master')
+
   if ([...earned].length >= 5) earn('collector')
 
   const allIslandIds = levelsData.islands.map(i => i.id)

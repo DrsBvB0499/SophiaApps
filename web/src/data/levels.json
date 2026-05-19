@@ -4,10 +4,7 @@
             "id": 1,
             "name": "Bananeneiland",
             "color": "#F7B731",
-            "position": [
-                200,
-                400
-            ],
+            "position": [200, 400],
             "unlocked": true,
             "levels": [
                 {
@@ -15,24 +12,12 @@
                     "title": "Eerste stappen",
                     "type": "sequence",
                     "instruction": "Help de aap naar de banaan! Zet de stappen in de goede volgorde.",
-                    "available_blocks": [
-                        "Ga naar rechts",
-                        "Pak de banaan"
-                    ],
-                    "correct_sequence": [
-                        "Ga naar rechts",
-                        "Pak de banaan"
-                    ],
-                    "character_actions": [
-                        "move_right",
-                        "grab"
-                    ],
+                    "hint": "Ga eerst naar rechts, pak dan de banaan!",
+                    "available_blocks": ["Ga naar rechts", "Pak de banaan"],
+                    "correct_sequence": ["Ga naar rechts", "Pak de banaan"],
+                    "character_actions": ["move_right", "grab"],
                     "max_stars": 3,
-                    "star_thresholds": {
-                        "3": 0,
-                        "2": 1,
-                        "1": 2
-                    },
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
                     "xp": 50,
                     "banana_high": false,
                     "obstacle": "none"
@@ -42,27 +27,12 @@
                     "title": "Omweg",
                     "type": "sequence",
                     "instruction": "De banaan hangt hoog! Ga naar rechts en spring dan omhoog.",
-                    "available_blocks": [
-                        "Spring omhoog",
-                        "Ga naar rechts",
-                        "Pak de banaan"
-                    ],
-                    "correct_sequence": [
-                        "Ga naar rechts",
-                        "Spring omhoog",
-                        "Pak de banaan"
-                    ],
-                    "character_actions": [
-                        "move_right",
-                        "jump",
-                        "grab"
-                    ],
+                    "hint": "Eerst naar rechts lopen, dan omhoog springen, dan pakken!",
+                    "available_blocks": ["Spring omhoog", "Ga naar rechts", "Pak de banaan"],
+                    "correct_sequence": ["Ga naar rechts", "Spring omhoog", "Pak de banaan"],
+                    "character_actions": ["move_right", "jump", "grab"],
                     "max_stars": 3,
-                    "star_thresholds": {
-                        "3": 0,
-                        "2": 1,
-                        "1": 2
-                    },
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
                     "xp": 60,
                     "banana_high": true,
                     "obstacle": "none"
@@ -72,30 +42,14 @@
                     "title": "Welk blok?",
                     "type": "choice",
                     "instruction": "Welk blok hoort op de lege plek?",
-                    "program_prefix": [
-                        "Ga naar rechts"
-                    ],
-                    "program_suffix": [
-                        "Pak de banaan"
-                    ],
+                    "hint": "De banaan hangt hoog, dus de aap moet omhoog springen!",
+                    "program_prefix": ["Ga naar rechts"],
+                    "program_suffix": ["Pak de banaan"],
                     "correct_block": "Spring omhoog",
-                    "options": [
-                        "Spring omhoog",
-                        "Ga naar links",
-                        "Slaap",
-                        "Ren snel"
-                    ],
-                    "character_actions": [
-                        "move_right",
-                        "jump",
-                        "grab"
-                    ],
+                    "options": ["Spring omhoog", "Ga naar links", "Slaap", "Ren snel"],
+                    "character_actions": ["move_right", "jump", "grab"],
                     "max_stars": 3,
-                    "star_thresholds": {
-                        "3": 0,
-                        "2": 1,
-                        "1": 2
-                    },
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
                     "xp": 60,
                     "banana_high": true,
                     "obstacle": "none"
@@ -105,22 +59,12 @@
                     "title": "Vind de fout",
                     "type": "debug",
                     "instruction": "Er zit een fout in de code! Klik op het foute blok.",
-                    "program": [
-                        "Ga naar rechts",
-                        "Ga naar links",
-                        "Pak de banaan"
-                    ],
+                    "hint": "De aap moet naar rechts, dan de banaan pakken. Welk blok klopt niet?",
+                    "program": ["Ga naar rechts", "Ga naar links", "Pak de banaan"],
                     "wrong_index": 1,
-                    "character_actions": [
-                        "move_right",
-                        "grab"
-                    ],
+                    "character_actions": ["move_right", "grab"],
                     "max_stars": 3,
-                    "star_thresholds": {
-                        "3": 0,
-                        "2": 1,
-                        "1": 2
-                    },
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
                     "xp": 70,
                     "banana_high": false,
                     "obstacle": "none"
@@ -131,10 +75,7 @@
             "id": 2,
             "name": "Junglebos",
             "color": "#20BF6B",
-            "position": [
-                500,
-                280
-            ],
+            "position": [500, 280],
             "unlocked": false,
             "levels": [
                 {
@@ -142,28 +83,12 @@
                     "title": "Door het bos",
                     "type": "sequence",
                     "instruction": "Help de aap door het bos! Zet de stappen in de goede volgorde.",
-                    "available_blocks": [
-                        "Ga naar links",
-                        "Stap over steen",
-                        "Ga naar rechts",
-                        "Pak de banaan"
-                    ],
-                    "correct_sequence": [
-                        "Ga naar rechts",
-                        "Stap over steen",
-                        "Pak de banaan"
-                    ],
-                    "character_actions": [
-                        "move_right",
-                        "jump",
-                        "grab"
-                    ],
+                    "hint": "Ga rechts, stap over de steen, pak de banaan!",
+                    "available_blocks": ["Ga naar links", "Stap over steen", "Ga naar rechts", "Pak de banaan"],
+                    "correct_sequence": ["Ga naar rechts", "Stap over steen", "Pak de banaan"],
+                    "character_actions": ["move_right", "jump", "grab"],
                     "max_stars": 3,
-                    "star_thresholds": {
-                        "3": 0,
-                        "2": 1,
-                        "1": 2
-                    },
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
                     "xp": 80,
                     "banana_high": false,
                     "obstacle": "stone"
@@ -173,31 +98,14 @@
                     "title": "Welke sprong?",
                     "type": "choice",
                     "instruction": "De aap moet over de rivier! Welk blok hoort hier?",
-                    "program_prefix": [
-                        "Ga naar rechts"
-                    ],
-                    "program_suffix": [
-                        "Land veilig",
-                        "Pak de banaan"
-                    ],
+                    "hint": "Over water moet je ver springen!",
+                    "program_prefix": ["Ga naar rechts"],
+                    "program_suffix": ["Land veilig", "Pak de banaan"],
                     "correct_block": "Spring ver",
-                    "options": [
-                        "Spring ver",
-                        "Stap opzij",
-                        "Ga terug",
-                        "Slaap"
-                    ],
-                    "character_actions": [
-                        "move_right",
-                        "jump",
-                        "grab"
-                    ],
+                    "options": ["Spring ver", "Stap opzij", "Ga terug", "Slaap"],
+                    "character_actions": ["move_right", "jump", "grab"],
                     "max_stars": 3,
-                    "star_thresholds": {
-                        "3": 0,
-                        "2": 1,
-                        "1": 2
-                    },
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
                     "xp": 80,
                     "banana_high": false,
                     "obstacle": "river"
@@ -207,24 +115,12 @@
                     "title": "Jungle fout",
                     "type": "debug",
                     "instruction": "De aap raakt verdwaald! Klik op het foute blok.",
-                    "program": [
-                        "Ga naar rechts",
-                        "Spring omhoog",
-                        "Ga naar links",
-                        "Pak de banaan"
-                    ],
+                    "hint": "De aap moet rechts gaan, dan springen, dan pakken. Welk blok klopt niet?",
+                    "program": ["Ga naar rechts", "Spring omhoog", "Ga naar links", "Pak de banaan"],
                     "wrong_index": 2,
-                    "character_actions": [
-                        "move_right",
-                        "jump",
-                        "grab"
-                    ],
+                    "character_actions": ["move_right", "jump", "grab"],
                     "max_stars": 3,
-                    "star_thresholds": {
-                        "3": 0,
-                        "2": 1,
-                        "1": 2
-                    },
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
                     "xp": 90,
                     "banana_high": false,
                     "obstacle": "stone"
@@ -234,20 +130,12 @@
                     "title": "Herhaling!",
                     "type": "loop",
                     "instruction": "De aap moet 3 stappen naar rechts. Gebruik de HERHAAL knop!",
+                    "hint": "Tel het aantal stappen: de banaan is 3 stappen ver!",
                     "base_block": "Stap naar rechts",
                     "correct_count": 3,
-                    "character_actions": [
-                        "move_right",
-                        "move_right",
-                        "move_right",
-                        "grab"
-                    ],
+                    "character_actions": ["move_right", "move_right", "move_right", "grab"],
                     "max_stars": 3,
-                    "star_thresholds": {
-                        "3": 0,
-                        "2": 1,
-                        "1": 2
-                    },
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
                     "xp": 100,
                     "banana_high": false,
                     "obstacle": "none"
@@ -258,10 +146,7 @@
             "id": 3,
             "name": "IJsberg",
             "color": "#74B9FF",
-            "position": [
-                760,
-                180
-            ],
+            "position": [760, 180],
             "unlocked": false,
             "levels": [
                 {
@@ -269,28 +154,12 @@
                     "title": "Glad ijs",
                     "type": "sequence",
                     "instruction": "Het ijs is glad! Zet de stappen in de goede volgorde.",
-                    "available_blocks": [
-                        "Schuif rechts",
-                        "Klim omhoog",
-                        "Pak de vis",
-                        "Schuif links"
-                    ],
-                    "correct_sequence": [
-                        "Schuif rechts",
-                        "Klim omhoog",
-                        "Pak de vis"
-                    ],
-                    "character_actions": [
-                        "move_right",
-                        "jump",
-                        "grab"
-                    ],
+                    "hint": "Schuif rechts, klim omhoog, pak de vis!",
+                    "available_blocks": ["Schuif rechts", "Klim omhoog", "Pak de vis", "Schuif links"],
+                    "correct_sequence": ["Schuif rechts", "Klim omhoog", "Pak de vis"],
+                    "character_actions": ["move_right", "jump", "grab"],
                     "max_stars": 3,
-                    "star_thresholds": {
-                        "3": 0,
-                        "2": 1,
-                        "1": 2
-                    },
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
                     "xp": 100,
                     "banana_high": true,
                     "obstacle": "none"
@@ -300,32 +169,14 @@
                     "title": "IJsberg keuze",
                     "type": "choice",
                     "instruction": "Welk blok helpt de aap over de ijsberg?",
-                    "program_prefix": [
-                        "Schuif rechts",
-                        "Schuif rechts"
-                    ],
-                    "program_suffix": [
-                        "Pak de vis"
-                    ],
+                    "hint": "Om over een ijsberg te gaan moet je omhoog klimmen!",
+                    "program_prefix": ["Schuif rechts", "Schuif rechts"],
+                    "program_suffix": ["Pak de vis"],
                     "correct_block": "Klim omhoog",
-                    "options": [
-                        "Klim omhoog",
-                        "Spring terug",
-                        "Ga slapen",
-                        "Schuif links"
-                    ],
-                    "character_actions": [
-                        "move_right",
-                        "move_right",
-                        "jump",
-                        "grab"
-                    ],
+                    "options": ["Klim omhoog", "Spring terug", "Ga slapen", "Schuif links"],
+                    "character_actions": ["move_right", "move_right", "jump", "grab"],
                     "max_stars": 3,
-                    "star_thresholds": {
-                        "3": 0,
-                        "2": 1,
-                        "1": 2
-                    },
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
                     "xp": 100,
                     "banana_high": false,
                     "obstacle": "ice_mound"
@@ -335,22 +186,436 @@
                     "title": "Dubbele herhaling",
                     "type": "loop",
                     "instruction": "De aap moet 4 stappen schuiven. Gebruik de HERHAAL knop!",
+                    "hint": "Tel de stappen: 4 keer schuiven!",
                     "base_block": "Schuif rechts",
                     "correct_count": 4,
-                    "character_actions": [
-                        "move_right",
-                        "move_right",
-                        "move_right",
-                        "move_right",
-                        "grab"
-                    ],
+                    "character_actions": ["move_right", "move_right", "move_right", "move_right", "grab"],
                     "max_stars": 3,
-                    "star_thresholds": {
-                        "3": 0,
-                        "2": 1,
-                        "1": 2
-                    },
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
                     "xp": 110,
+                    "banana_high": false,
+                    "obstacle": "none"
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "name": "Woestijn",
+            "color": "#E8A838",
+            "position": [300, 580],
+            "unlocked": false,
+            "levels": [
+                {
+                    "id": 1,
+                    "title": "Hete zand",
+                    "type": "sequence",
+                    "instruction": "De aap is in de woestijn! Help hem naar de mango.",
+                    "hint": "Ga eerst naar rechts, dan pak je de mango!",
+                    "available_blocks": ["Ga naar rechts", "Pak de mango", "Ga terug"],
+                    "correct_sequence": ["Ga naar rechts", "Pak de mango"],
+                    "character_actions": ["move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 110,
+                    "banana_high": false,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 2,
+                    "title": "Cactus!",
+                    "type": "choice",
+                    "instruction": "Er staat een cactus in de weg. Welk blok past hier?",
+                    "hint": "Je moet over de cactus springen!",
+                    "program_prefix": ["Ga naar rechts"],
+                    "program_suffix": ["Pak de mango"],
+                    "correct_block": "Spring over cactus",
+                    "options": ["Spring over cactus", "Ga terug", "Wacht", "Ren weg"],
+                    "character_actions": ["move_right", "jump", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 120,
+                    "banana_high": false,
+                    "obstacle": "cactus"
+                },
+                {
+                    "id": 3,
+                    "title": "Woestijntocht",
+                    "type": "loop",
+                    "instruction": "De mango is ver weg! De aap moet 4 stappen lopen.",
+                    "hint": "Tel hoeveel stappen nodig zijn: 4 keer lopen!",
+                    "base_block": "Stap naar rechts",
+                    "correct_count": 4,
+                    "character_actions": ["move_right", "move_right", "move_right", "move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 120,
+                    "banana_high": false,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 4,
+                    "title": "Als... dan...",
+                    "type": "if_else",
+                    "instruction": "De aap kijkt of er een cactus is. Wat moet hij doen als er WEL een cactus is, en als er GEEN cactus is?",
+                    "hint": "ALS er een cactus is → spring erover. ANDERS → ga gewoon door naar rechts!",
+                    "condition_text": "Is er een cactus in de weg?",
+                    "if_options": ["Spring erover", "Ga terug", "Stop"],
+                    "else_options": ["Ga naar rechts", "Spring omhoog", "Stop"],
+                    "correct_if": "Spring erover",
+                    "correct_else": "Ga naar rechts",
+                    "character_actions": ["move_right", "jump", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 140,
+                    "banana_high": false,
+                    "obstacle": "cactus"
+                },
+                {
+                    "id": 5,
+                    "title": "Hoog of laag?",
+                    "type": "if_else",
+                    "instruction": "Soms hangt de mango hoog, soms laag. Kies de juiste actie voor elk geval!",
+                    "hint": "ALS de mango hoog hangt → klim omhoog. ANDERS → pak hem gewoon!",
+                    "condition_text": "Hangt de mango hoog?",
+                    "if_options": ["Klim omhoog", "Ga terug", "Stop"],
+                    "else_options": ["Pak de mango", "Spring omhoog", "Wacht"],
+                    "correct_if": "Klim omhoog",
+                    "correct_else": "Pak de mango",
+                    "character_actions": ["move_right", "jump", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 150,
+                    "banana_high": true,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 6,
+                    "title": "Woestijn bug",
+                    "type": "debug",
+                    "instruction": "Er zit een fout in het programma! Klik op het foute blok.",
+                    "hint": "De aap moet: ga naar rechts → spring over cactus → pak de mango!",
+                    "program": ["Ga naar rechts", "Pak de mango", "Spring over cactus"],
+                    "wrong_index": 1,
+                    "character_actions": ["move_right", "jump", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 150,
+                    "banana_high": false,
+                    "obstacle": "cactus"
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "name": "Onderwater",
+            "color": "#2980B9",
+            "position": [600, 560],
+            "unlocked": false,
+            "levels": [
+                {
+                    "id": 1,
+                    "title": "Duiken!",
+                    "type": "sequence",
+                    "instruction": "De aap duikt onder water! Help hem naar de ster.",
+                    "hint": "Zwem eerst naar rechts, pak dan de ster!",
+                    "available_blocks": ["Zwem naar rechts", "Pak de ster", "Zwem terug"],
+                    "correct_sequence": ["Zwem naar rechts", "Pak de ster"],
+                    "character_actions": ["move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 120,
+                    "banana_high": false,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 2,
+                    "title": "Koraal!",
+                    "type": "choice",
+                    "instruction": "Er staat koraal in de weg. Welk blok past hier?",
+                    "hint": "Je moet over het koraal zwemmen!",
+                    "program_prefix": ["Zwem naar rechts"],
+                    "program_suffix": ["Pak de ster"],
+                    "correct_block": "Zwem omhoog",
+                    "options": ["Zwem omhoog", "Zwem terug", "Stop", "Wacht"],
+                    "character_actions": ["move_right", "jump", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 130,
+                    "banana_high": false,
+                    "obstacle": "coral"
+                },
+                {
+                    "id": 3,
+                    "title": "Lange zwemtocht",
+                    "type": "loop",
+                    "instruction": "De ster is ver weg! De aap moet 3 keer zwemmen.",
+                    "hint": "Tel de zwembewegingen: 3 keer zwemmen!",
+                    "base_block": "Zwem naar rechts",
+                    "correct_count": 3,
+                    "character_actions": ["move_right", "move_right", "move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 130,
+                    "banana_high": false,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 4,
+                    "title": "Variabele!",
+                    "type": "variable",
+                    "instruction": "Gebruik een variabele! Stel STAPPEN in op het juiste getal zodat de aap bij de ster komt.",
+                    "hint": "Tel hoeveel stappen de aap moet zetten: de ster is 3 stappen ver!",
+                    "variable_name": "STAPPEN",
+                    "base_block": "Zwem naar rechts",
+                    "correct_value": 3,
+                    "character_actions": ["move_right", "move_right", "move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 150,
+                    "banana_high": false,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 5,
+                    "title": "Juiste waarde",
+                    "type": "variable",
+                    "instruction": "Stel STAPPEN in op het juiste getal. De ster is verder weg deze keer!",
+                    "hint": "Kijk goed hoe ver de ster is: de aap moet 5 keer zwemmen!",
+                    "variable_name": "STAPPEN",
+                    "base_block": "Zwem naar rechts",
+                    "correct_value": 5,
+                    "character_actions": ["move_right", "move_right", "move_right", "move_right", "move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 160,
+                    "banana_high": false,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 6,
+                    "title": "Water bug",
+                    "type": "debug",
+                    "instruction": "Het programma heeft een fout! Klik op het foute blok.",
+                    "hint": "De aap moet: zwem rechts → zwem omhoog → pak de ster!",
+                    "program": ["Zwem naar rechts", "Pak de ster", "Zwem omhoog"],
+                    "wrong_index": 1,
+                    "character_actions": ["move_right", "jump", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 160,
+                    "banana_high": false,
+                    "obstacle": "coral"
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "name": "Ruimte",
+            "color": "#8E44AD",
+            "position": [800, 500],
+            "unlocked": false,
+            "levels": [
+                {
+                    "id": 1,
+                    "title": "In de ruimte!",
+                    "type": "sequence",
+                    "instruction": "De aap is in de ruimte! Help hem naar de ster.",
+                    "hint": "Vlieg eerst naar rechts, pak dan de ster!",
+                    "available_blocks": ["Vlieg naar rechts", "Pak de ster", "Vlieg terug"],
+                    "correct_sequence": ["Vlieg naar rechts", "Pak de ster"],
+                    "character_actions": ["move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 130,
+                    "banana_high": false,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 2,
+                    "title": "Raket boost",
+                    "type": "loop",
+                    "instruction": "De aap geeft 4 raket-stoten om verder te komen. Gebruik de HERHAAL knop!",
+                    "hint": "4 keer een raket-stoot!",
+                    "base_block": "Raket-stoot",
+                    "correct_count": 4,
+                    "character_actions": ["move_right", "move_right", "move_right", "move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 140,
+                    "banana_high": false,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 3,
+                    "title": "Mijn eigen blok!",
+                    "type": "function",
+                    "instruction": "Maak je eigen blok genaamd 'Grote sprong'! Zet de acties erin en gebruik het dan in je programma.",
+                    "hint": "Je eigen blok 'Grote sprong' moet doen: Vlieg omhoog → Vlieg naar rechts. Gebruik het dan gevolgd door Pak de ster!",
+                    "function_name": "Grote sprong",
+                    "function_options": ["Vlieg omhoog", "Vlieg naar rechts", "Stop", "Draai om"],
+                    "correct_function_body": ["Vlieg omhoog", "Vlieg naar rechts"],
+                    "main_options": ["Grote sprong", "Pak de ster", "Vlieg terug"],
+                    "correct_main": ["Grote sprong", "Pak de ster"],
+                    "character_actions": ["jump", "move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 160,
+                    "banana_high": true,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 4,
+                    "title": "Ruimtestap",
+                    "type": "function",
+                    "instruction": "Maak je blok 'Ruimtestap' en gebruik het 2 keer in je programma!",
+                    "hint": "Je blok 'Ruimtestap' doet: Vlieg naar rechts. Gebruik het dan 2 keer, daarna Pak de ster!",
+                    "function_name": "Ruimtestap",
+                    "function_options": ["Vlieg naar rechts", "Vlieg omhoog", "Stop"],
+                    "correct_function_body": ["Vlieg naar rechts"],
+                    "main_options": ["Ruimtestap", "Ruimtestap", "Pak de ster", "Vlieg terug"],
+                    "correct_main": ["Ruimtestap", "Ruimtestap", "Pak de ster"],
+                    "character_actions": ["move_right", "move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 170,
+                    "banana_high": false,
+                    "obstacle": "asteroid"
+                },
+                {
+                    "id": 5,
+                    "title": "Asteroïde!",
+                    "type": "if_else",
+                    "instruction": "Er kan een asteroïde in de weg zijn. Wat doet de aap in elk geval?",
+                    "hint": "ALS er een asteroïde is → vlieg eroverheen. ANDERS → vlieg gewoon door!",
+                    "condition_text": "Is er een asteroïde in de weg?",
+                    "if_options": ["Vlieg eroverheen", "Stop", "Vlieg terug"],
+                    "else_options": ["Vlieg naar rechts", "Stop", "Draai om"],
+                    "correct_if": "Vlieg eroverheen",
+                    "correct_else": "Vlieg naar rechts",
+                    "character_actions": ["move_right", "jump", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 170,
+                    "banana_high": false,
+                    "obstacle": "asteroid"
+                },
+                {
+                    "id": 6,
+                    "title": "Ruimte bug",
+                    "type": "debug",
+                    "instruction": "De aap vloog de verkeerde kant op! Klik op het foute blok.",
+                    "hint": "De aap moet: vlieg rechts → vlieg omhoog → pak de ster!",
+                    "program": ["Vlieg naar rechts", "Vlieg naar links", "Vlieg omhoog", "Pak de ster"],
+                    "wrong_index": 1,
+                    "character_actions": ["move_right", "jump", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 180,
+                    "banana_high": true,
+                    "obstacle": "none"
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "name": "Vulkaan",
+            "color": "#C0392B",
+            "position": [250, 750],
+            "unlocked": false,
+            "levels": [
+                {
+                    "id": 1,
+                    "title": "Lava pad",
+                    "type": "sequence",
+                    "instruction": "De aap klimt op de vulkaan! Help hem naar de diamant.",
+                    "hint": "Klim eerst naar rechts, pak dan de diamant!",
+                    "available_blocks": ["Klim naar rechts", "Pak de diamant", "Spring over lava", "Ga terug"],
+                    "correct_sequence": ["Klim naar rechts", "Pak de diamant"],
+                    "character_actions": ["move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 140,
+                    "banana_high": false,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 2,
+                    "title": "Lava of pad?",
+                    "type": "if_else",
+                    "instruction": "Er kan lava in de weg liggen. Wat doet de aap in elk geval?",
+                    "hint": "ALS er lava is → spring erover. ANDERS → klim gewoon door!",
+                    "condition_text": "Ligt er lava in de weg?",
+                    "if_options": ["Spring over lava", "Stop", "Ga terug"],
+                    "else_options": ["Klim naar rechts", "Spring omhoog", "Wacht"],
+                    "correct_if": "Spring over lava",
+                    "correct_else": "Klim naar rechts",
+                    "character_actions": ["move_right", "jump", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 150,
+                    "banana_high": false,
+                    "obstacle": "lava_rock"
+                },
+                {
+                    "id": 3,
+                    "title": "Dubbele herhaling!",
+                    "type": "nested_loop",
+                    "instruction": "De aap moet een patroon lopen! Kies het juiste aantal voor BEIDE herhalingen.",
+                    "hint": "De buitenste lus herhaalt 2 keer, de binnenste ook 2 keer. Samen is dat 2 × 2 = 4 stappen!",
+                    "base_block": "Stap",
+                    "correct_outer": 2,
+                    "correct_inner": 2,
+                    "character_actions": ["move_right", "move_right", "move_right", "move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 170,
+                    "banana_high": false,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 4,
+                    "title": "Groter patroon",
+                    "type": "nested_loop",
+                    "instruction": "Nu een groter patroon! De aap moet 6 stappen zetten. Kies 2 en 3.",
+                    "hint": "Buitenste lus: 2 keer. Binnenste lus: 3 keer. Samen: 2 × 3 = 6 stappen!",
+                    "base_block": "Klim",
+                    "correct_outer": 2,
+                    "correct_inner": 3,
+                    "character_actions": ["move_right", "move_right", "move_right", "move_right", "move_right", "move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 180,
+                    "banana_high": false,
+                    "obstacle": "none"
+                },
+                {
+                    "id": 5,
+                    "title": "Vulkaan bug",
+                    "type": "debug",
+                    "instruction": "Er zit een fout in het klim-programma! Klik op het foute blok.",
+                    "hint": "De aap moet: klim rechts → spring over lava → pak de diamant!",
+                    "program": ["Klim naar rechts", "Ga terug", "Spring over lava", "Pak de diamant"],
+                    "wrong_index": 1,
+                    "character_actions": ["move_right", "jump", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 180,
+                    "banana_high": false,
+                    "obstacle": "lava_rock"
+                },
+                {
+                    "id": 6,
+                    "title": "Vulkaan meester!",
+                    "type": "nested_loop",
+                    "instruction": "Het zwaarste niveau! De aap moet 9 stappen zetten. Kies 3 en 3.",
+                    "hint": "Buitenste lus: 3 keer. Binnenste lus: 3 keer. Samen: 3 × 3 = 9 stappen!",
+                    "base_block": "Klim",
+                    "correct_outer": 3,
+                    "correct_inner": 3,
+                    "character_actions": ["move_right", "move_right", "move_right", "move_right", "move_right", "move_right", "move_right", "move_right", "move_right", "grab"],
+                    "max_stars": 3,
+                    "star_thresholds": {"3": 0, "2": 1, "1": 2},
+                    "xp": 200,
                     "banana_high": false,
                     "obstacle": "none"
                 }
